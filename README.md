@@ -29,7 +29,7 @@ Environment variables:
 
 Wdio config example:
 ```js
-import ZebrunnerReporter from "./reporter/reporter";
+const { ZebrunnerReporter } = require('@zebrunner/javascript-agent-webdriver');
 require("dotenv").config();
 
 const config = {
@@ -52,26 +52,6 @@ module.export = {
   reporters: [[ZebrunnerReporter, config]],
 };
 ```
-
-<!-- ## Collecting test logs
-
-It is also possible to enable the log collection for your tests.
-
-```js
-import Logger from "../../reporter/services/logger";
-import { reporterEmitter } from "../../reporter/reporterEmitter";
-
-const logger = new Logger();
-
-describe("run describe", () => {
-  it("test describe", () => {
-    logger.setTestLog("awesome log1");
-    logger.setTestLog("awesome log2");
-    reporterEmitter.setTestLogs(logger.getTestLogs());
-  });
-});
-``` -->
-
 ## Attach video and screenshots
 
 First you need additional library `wdio-video-reporter`
@@ -81,7 +61,8 @@ First you need additional library `wdio-video-reporter`
 then add video-reporter to `wdio.conf.js`
 
 ```js
-import ZebrunnerReporter from "./reporter/reporter";
+const { ZebrunnerReporter } = require('@zebrunner/javascript-agent-webdriver');
+require('dotenv').config();
 const video = require("wdio-video-reporter");
 
 module.exports = {
@@ -111,7 +92,8 @@ Artifacts methods:
 - The `attachReferenceToTestRun(name, reference)` and `attachReferenceToTest(name, reference)` methods can be used to attach an arbitrary artifact reference to test run and test respectively.
 
 ```js
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
+
 
 describe("run describe", () => {
   before(() => {
@@ -138,7 +120,8 @@ describe("run describe", () => {
 You may want to add transparency to the process of automation maintenance by having an engineer responsible for evolution of specific tests or test classes. Zebrunner comes with a concept of a maintainer - a person that can be assigned to maintain tests. In order to keep track of those, the agent comes with the `setMaintainer` method.
 
 ```js
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
+
 
 describe("run describe", () => {
   it("test", () => {
@@ -167,10 +150,8 @@ Labels methods:
 - `setTestLabel({key: value})` attached labels for test
 
 ```js
-import Labels from "../../reporter/services/labels";
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
 
-const label = new Labels();
 
 describe("run describe", () => {
   before(() => {
@@ -205,7 +186,8 @@ In some cases it might be handy not to register test execution in Zebrunner. Thi
 You can use `revertTestRegistration` method for managing test registration at runtime.
 
 ```js
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
+
 
 describe("run describe", () => {
   it("test describe", () => {
@@ -246,7 +228,8 @@ Zebrunner agent has a special TestRail class with a bunch of methods to control 
   By default, a new run containing only cases assigned to the tests will be created in TestRail on test run finish;
 
 ```js
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
+
 
 describe("run describe", () => {
   before(() => {
@@ -301,7 +284,8 @@ Zebrunner agent has a special Xray class with a bunch of methods to control resu
 - `enableRealTimeSync`(boolean) - `optional`. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. Same as `setExecutionKey`(string), this method must be invoked before all tests.
 
 ```js
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
+
 
 describe("run describe", () => {
   before(() => {
@@ -344,7 +328,8 @@ For successful upload of test run results in Zephyr two steps must be performed:
 
 
 ```js
-import { reporterEmitter } from "../../reporter/reporterEmitter";
+const { reporterEmitter } = require('@zebrunner/javascript-agent-webdriver');
+
 
 describe("run describe", () => {
   before(() => {
@@ -376,5 +361,6 @@ Sometimes reporter doesn't have enough time to complete run and you need to add 
 ```js
 exports.config = {
   reporterSyncInterval: 10 * 1000,
+  // ...another config options
 };
 ```

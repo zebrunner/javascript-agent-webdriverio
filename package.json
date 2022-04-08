@@ -1,6 +1,6 @@
 {
     "name": "@zebrunner/javascript-agent-webdriver",
-    "version": "1.0.0",
+    "version": "1.0.0-alpha",
     "description": "Zebrunner Agent for Webdriver.io",
     "main": "build/index.js",
     "scripts": {
