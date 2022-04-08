@@ -90,7 +90,7 @@ describe('Ebay Product Search', () => {
 
   it('should search telephones and verify title', async () => {
 
-    reporterEmitter.setMaintainer('emarf');
+    // reporterEmitter.setMaintainer('emarf');
     reporterEmitter.setTestLabels({
       Author: 'simple',
     });
