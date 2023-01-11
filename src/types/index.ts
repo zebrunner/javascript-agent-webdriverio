@@ -1,39 +1,20 @@
-export type ReporterConfig = {
-  enabled: boolean;
-  reportingServerHostname: string;
-  reportingProjectKey?: string;
-  reportingRunDisplayName?: string;
-  reportingRunBuild?: string;
-  reportingRunEnvironment?: string;
-  reportingNotifyOnEachFailure?: boolean;
-  reportingNotificationSlackChannels?: string;
-  reportingNotificationMsTeamsChannels?: string;
-  reportingNotificationEmails?: string;
-  reportingMilestoneId?: string;
-  reportingMilestoneName?: string;
-  reportingRunLocale?: string;
-};
+export {RefreshTokenRequest} from "./refresh-token"
+export {CorrelationData} from "./correlation-data"
+export {ExchangedRunContext, Test} from "./exchanged-run-context"
 
-export type BrowserCapabilities = {
-  browserName?: string;
-  browserVersion?: string;
-  platformName?: string;
-};
+export {StartTestRunRequest} from "./start-test-run"
+export {StartTestSessionRequest, TestSessionStartStatus} from "./start-test-session"
 
-export type RunOptions = {
-  tcmConfig?: {};
-  labels?: any[];
-  attachments?: [];
-  references?: [];
-};
+export {StartTestRequest} from "./start-test"
+export {LinkTestsAndTestSessionRequest} from "./link-tests-and-test-session"
+export {FinishTestRequest, TestFinishStatus} from "./finish-test"
 
-export type TestOptions = {
-  [id: string]: {
-    maintainer?: string;
-    testTcmOptions?: [][];
-    labels?: [][];
-    attachments?: [][];
-    references?: [][];
-    revertTest?: boolean;
-  };
-};
+export {FinishTestSessionRequest} from "./finish-test-session"
+export {FinishTestRunRequest} from "./finish-test-run"
+
+export {LogEntry} from "./log-entry"
+export {Label} from "./label"
+export {ArtifactReference} from "./artifact-reference"
+export {UpdateTestRequest} from "./update-test"
+export {AttachLabelsRequest} from "./attach-labels"
+export {AttachArtifactReferencesRequest} from "./attach-artifact-references"
