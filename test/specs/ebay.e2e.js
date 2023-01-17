@@ -1,5 +1,5 @@
-const log = require("loglevel")
-const {currentTest, currentTestRun} = require("../../src")
+import log from "loglevel"
+const {currentTest, currentLaunch} = require("../../src")
 
 describe('Ebay Product Search', () => {
 
@@ -46,7 +46,7 @@ describe('Ebay Product Search', () => {
         await searchInput.addValue('telephones')
         await searchBtn.click()
 
-        currentTestRun.attachArtifactReference('ebay', 'https://ebay.com')
+        currentLaunch.attachArtifactReference('ebay', 'https://ebay.com')
 
         await expect(searchInput).toHaveValue('telephones')
         await expect(browser).toHaveTitle('telephones: Search Result | eBay')
@@ -58,7 +58,7 @@ describe('Ebay Product Search', () => {
     })
 
     after(function () {
-        currentTestRun.attachLabel('ebay-tests-finished', 'true')
+        currentLaunch.attachLabel('ebay-tests-finished', 'true')
     })
 
 })

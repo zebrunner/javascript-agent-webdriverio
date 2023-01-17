@@ -116,8 +116,10 @@ export class ZebrunnerService implements Services.ServiceInstance {
 
     async onComplete(exitCode: number, config: any, capabilities: RemoteCapabilities, results: any) {
         // todo add shutdown hook
-        const request = new FinishTestRunRequest();
-        return this.apiClient.finishTestRun(this.storage.testRunId, request);
+        if (this.storage.testRunId) {
+            const request = new FinishTestRunRequest();
+            return this.apiClient.finishTestRun(this.storage.testRunId, request);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

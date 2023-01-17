@@ -19,10 +19,10 @@ exports.config = {
         // 'path/to/excluded/files'
     ],
 
-    maxInstances: 1,
+    maxInstances: 5,
     capabilities: [
         {
-            maxInstances: 1,
+            maxInstances: 5,
             browserName: 'chrome',
         },
     ],
@@ -68,10 +68,9 @@ exports.config = {
                     name: 'Release 1.5.0'
                 },
                 screenshots: {
-                    auto: true,
-                    afterError: true,
                     beforeCommands: [],
-                    afterCommands: []
+                    afterCommands: [],
+                    afterError: true
                 },
                 logs: {
                     pushDelayMillis: 5000,
