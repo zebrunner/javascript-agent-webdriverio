@@ -1,9 +1,7 @@
 export class FinishTestSessionRequest {
-
-    endedAt: Date
+    endedAt: Date;
 
     constructor() {
-        this.endedAt = new Date()
+        this.endedAt = new Date();
     }
-
 }
