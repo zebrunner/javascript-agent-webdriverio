@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import log from 'loglevel';
+import { Buffer } from 'buffer';
 import { ZebrunnerPaths } from './constant';
 import { ReportingConfig } from './reporting-config';
 import {
@@ -124,7 +125,7 @@ export class ApiClient {
         return this.axiosInstance.put(ZebrunnerPaths.FINISH_TEST(testRunId, testId), request);
     }
 
-    async uploadTestScreenshot(testRunId: number, testId: number, screenshot: any): Promise<void> {
+    async uploadTestScreenshot(testRunId: number, testId: number, screenshot: Buffer): Promise<void> {
         const config: AxiosRequestConfig = {
             headers: {
                 'x-zbr-screenshot-captured-at': new Date().getTime(),

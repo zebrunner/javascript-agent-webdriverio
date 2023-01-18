@@ -4,8 +4,8 @@
   "description": "Zebrunner Agent for webdriver.io",
   "main": "build/index.js",
   "scripts": {
-    "clean": "rimraf ./build",
-    "build": "npm run clean && tsc -p ./tsconfig.json",
+    "prebuild": "rimraf ./build",
+    "build": "tsc -p ./tsconfig.json",
     "prewdio": "npm run build",
     "wdio": "wdio run ./wdio.conf.js",
     "lint": "eslint **/*.ts"
@@ -37,7 +37,8 @@
   "dependencies": {
     "@wdio/reporter": "^7.29.1",
     "@wdio/types": "^7.26.0",
-    "axios": "^0.26.1"
+    "axios": "^0.26.1",
+    "loglevel": "^1.8.1"
   },
   "keywords": [
     "wdio",

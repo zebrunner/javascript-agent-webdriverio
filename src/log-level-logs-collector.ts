@@ -16,7 +16,7 @@ export class LogLevelLogsCollector {
         const { messageCollector } = this;
         const originalFactory = logger.methodFactory;
 
-        logger.methodFactory = function (methodName, logLevel, loggerName) {
+        logger.methodFactory = (methodName, logLevel, loggerName) => {
             const originalMethod = originalFactory(methodName, logLevel, loggerName);
 
             return async (...args) => {

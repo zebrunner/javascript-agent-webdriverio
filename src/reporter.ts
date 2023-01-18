@@ -26,7 +26,7 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     private readonly log = log.getLogger('zebrunner');
 
-    private allEventsReportedToZebrunner = false;
+    private allEventsReportedToZebrunner: boolean;
 
     constructor(reporterConfig) {
         super(reporterConfig);
@@ -39,10 +39,19 @@ export class ZebrunnerReporter extends WDIOReporter {
         this.apiClient = this.storage.apiClient;
         this.logsManager = new LogsManager(this.storage);
 
+        this.allEventsReportedToZebrunner = true;
+    }
+
+    get isSynchronised() {
+        return this.allEventsReportedToZebrunner;
+    }
+
+    onRunnerStart(runnerStats: RunnerStats) {
+        this.allEventsReportedToZebrunner = false;
         this.registerActionListeners();
     }
 
-    registerActionListeners() {
+    private registerActionListeners() {
         process.on(EventNames.SET_TEST_MAINTAINER, this.setTestMaintainer.bind(this));
         process.on(EventNames.ATTACH_TEST_LABELS, this.attachTestLabels.bind(this));
         process.on(EventNames.ATTACH_TEST_ARTIFACT_REFERENCES, this.attachTestArtifactReferences.bind(this));
@@ -52,10 +61,6 @@ export class ZebrunnerReporter extends WDIOReporter {
 
         process.on(EventNames.ATTACH_TEST_RUN_LABELS, this.attachTestRunLabels.bind(this));
         process.on(EventNames.ATTACH_TEST_RUN_ARTIFACT_REFERENCES, this.attachTestRunArtifactReferences.bind(this));
-    }
-
-    get isSynchronised() {
-        return this.allEventsReportedToZebrunner;
     }
 
     onSuiteStart(suiteStats: SuiteStats) {
@@ -119,7 +124,20 @@ export class ZebrunnerReporter extends WDIOReporter {
         await this.logsManager.close();
         await this.storage.allPromises();
 
+        this.removeActionListeners();
         this.allEventsReportedToZebrunner = true;
+    }
+
+    private removeActionListeners() {
+        process.off(EventNames.SET_TEST_MAINTAINER, this.setTestMaintainer.bind(this));
+        process.off(EventNames.ATTACH_TEST_LABELS, this.attachTestLabels.bind(this));
+        process.off(EventNames.ATTACH_TEST_ARTIFACT_REFERENCES, this.attachTestArtifactReferences.bind(this));
+        process.off(EventNames.REVERT_TEST_REGISTRATION, this.revertTestRegistration.bind(this));
+
+        process.off(EventNames.SAVE_TEST_SCREENSHOT_BUFFER, this.saveScreenshotBuffer.bind(this));
+
+        process.off(EventNames.ATTACH_TEST_RUN_LABELS, this.attachTestRunLabels.bind(this));
+        process.off(EventNames.ATTACH_TEST_RUN_ARTIFACT_REFERENCES, this.attachTestRunArtifactReferences.bind(this));
     }
 
     private setTestMaintainer(maintainer: string) {

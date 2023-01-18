@@ -18,8 +18,6 @@ export class StartTestSessionRequest {
     testIds?: number[];
 
     static running(browser: any, desiredCapabilities: any, testId?: number): StartTestSessionRequest {
-        // todo to be removed
-        desiredCapabilities.provider = 'ZEBRUNNER';
         return {
             sessionId: browser.sessionId,
             initiatedAt: new Date(),
@@ -32,8 +30,6 @@ export class StartTestSessionRequest {
     }
 
     static failed(desiredCapabilities: any): StartTestSessionRequest {
-        // todo to be removed
-        desiredCapabilities.provider = 'ZEBRUNNER';
         return {
             initiatedAt: new Date(),
             status: 'FAILED',

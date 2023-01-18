@@ -19,10 +19,10 @@ exports.config = {
         // 'path/to/excluded/files'
     ],
 
-    maxInstances: 1,
+    maxInstances: 5,
     capabilities: [
         {
-            maxInstances: 1,
+            maxInstances: 5,
             browserName: 'chrome',
         },
     ],
@@ -49,7 +49,7 @@ exports.config = {
                     hostname: 'https://brenkotest1.zebrunner.com',
                     accessToken: 'VhL7PPdX2FOZN0voaz1z67TDIi6f1XwWhlhVSLym4C6rCN2wZn'
                 },
-                run: {
+                launch: {
                     displayName: null,
                     build: 'alpha-1',
                     environment: 'Local',
@@ -68,10 +68,9 @@ exports.config = {
                     name: 'Release 1.5.0'
                 },
                 screenshots: {
-                    auto: true,
-                    afterError: true,
                     beforeCommands: [],
-                    afterCommands: []
+                    afterCommands: [],
+                    afterError: true
                 },
                 logs: {
                     pushDelayMillis: 5000,

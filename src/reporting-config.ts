@@ -1,6 +1,6 @@
 import log from 'loglevel';
 import { ArtifactReference, Label } from './types';
-import { isArray, isNotBlankString } from './type-utils';
+import { isArray, isNotBlankString, isString } from './type-utils';
 
 const logger = log.getLogger('zebrunner');
 
@@ -96,7 +96,7 @@ function getSetOfStrings(envVar: string, configValue: any, defaultValue: string[
         ? tokenizeString(envVarValue)
         : isArray(configValue)
             ? configValue.flatMap((value) => tokenizeString(value))
-            : isNotBlankString(configValue)
+            : isString(configValue)
                 ? tokenizeString(configValue)
                 : defaultValue;
 
