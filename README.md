@@ -250,7 +250,7 @@ Moreover, the Zebrunner Agent will automatically substitute the Selenium server 
 
 ```js
 // ...
-const {ZebrunnerReporter, ZebrunnerService} = require('./build/index')
+const {ZebrunnerReporter, ZebrunnerService} = require("@zebrunner/javascript-agent-webdriverio")
 
 exports.config = {
     // these values are taken from Zebrunner Selenium Grid integration and replace the original ones.
