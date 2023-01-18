@@ -102,20 +102,31 @@ export class ZebrunnerReporter extends WDIOReporter {
     }
 
     async onTestSkip(testStats: TestStats) {
-        return this.onTestFinish(testStats, 'SKIPPED');
+        return this.storage.trackOperationPromise(async () => {
+            if (testStats.uid !== this.storage.currentTest.uid) {
+                // intentionally don't await for the onTestStart promise resolution,
+                // because we need to immediately get the testId promise in onTestFinish()
+                this.onTestStart(testStats);
+
+                return this.onTestFinish(testStats, 'SKIPPED');
+            }
+        });
     }
 
     async onTestFinish(testStats: TestStats, status: TestFinishStatus) {
-        const stack: string = testStats.errors?.[0]?.stack;
-        if (stack) {
-            this.log.error(stack);
-        }
-
         return this.storage.trackOperationPromise(async () => {
-            const testId = await this.storage.testId;
+            // we need to log error first and only then track test finish.
+            // in order to not lost the test id between these asynchronous operations, store testId promise to a separate variable
+            const testId: Promise<number> = this.storage.testId;
+
+            const stack: string = testStats.errors?.[0]?.stack;
+            if (stack) {
+                this.log.error(stack);
+            }
+
             if (testId) {
                 const request = new FinishTestRequest(status, stack);
-                return this.apiClient.finishTest(this.storage.testRunId, testId, request);
+                return this.apiClient.finishTest(this.storage.testRunId, await testId, request);
             }
         });
     }

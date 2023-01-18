@@ -52,6 +52,12 @@ describe('Ebay Product Search', () => {
         await expect(browser).toHaveTitle('telephones: Search Result | eBay')
     })
 
+    it.skip('skipped', () => {
+    })
+
+    it('empty', () => {
+    })
+
     afterEach(function () {
         logger.info('test finished')
         currentTest.attachLabel('in-after-each', 'true')
