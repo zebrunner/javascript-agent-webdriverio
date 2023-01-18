@@ -1,6 +1,6 @@
 import log from 'loglevel';
 import { ArtifactReference, Label } from './types';
-import { isArray, isNotBlankString , isString} from './type-utils';
+import { isArray, isNotBlankString, isString } from './type-utils';
 
 const logger = log.getLogger('zebrunner');
 

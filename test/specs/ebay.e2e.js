@@ -1,5 +1,5 @@
-import log from "loglevel"
-const {currentTest, currentLaunch} = require("../../src")
+const log = require("loglevel");
+const {currentTest, currentLaunch} = require("../../src");
 
 describe('Ebay Product Search', () => {
 

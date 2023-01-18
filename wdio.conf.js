@@ -49,7 +49,7 @@ exports.config = {
                     hostname: 'https://brenkotest1.zebrunner.com',
                     accessToken: 'VhL7PPdX2FOZN0voaz1z67TDIi6f1XwWhlhVSLym4C6rCN2wZn'
                 },
-                run: {
+                launch: {
                     displayName: null,
                     build: 'alpha-1',
                     environment: 'Local',
