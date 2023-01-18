@@ -8,29 +8,30 @@ export interface Test {
 }
 
 export class ExchangedRunContext {
+    testRunUuid: string;
 
-    testRunUuid: string
-    mode: RunMode
+    mode: RunMode;
 
-    runAllowed: boolean
-    reason: string
+    runAllowed: boolean;
 
-    runOnlySpecificTests: boolean
-    testsToRun: Test[]
+    reason: string;
 
-    fullExecutionPlanContext: string
+    runOnlySpecificTests: boolean;
+
+    testsToRun: Test[];
+
+    fullExecutionPlanContext: string;
 
     constructor(response: any) {
-        this.testRunUuid = response.testRunUuid
-        this.mode = response.mode
+        this.testRunUuid = response.testRunUuid;
+        this.mode = response.mode;
 
-        this.runAllowed = response.runAllowed
-        this.reason = response.reason
+        this.runAllowed = response.runAllowed;
+        this.reason = response.reason;
 
-        this.runOnlySpecificTests = response.runOnlySpecificTests
-        this.testsToRun = response.testsToRun
+        this.runOnlySpecificTests = response.runOnlySpecificTests;
+        this.testsToRun = response.testsToRun;
 
-        this.fullExecutionPlanContext = response.fullExecutionPlanContext
+        this.fullExecutionPlanContext = response.fullExecutionPlanContext;
     }
-
 }
