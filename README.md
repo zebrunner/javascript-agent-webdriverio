@@ -246,6 +246,8 @@ The Zebrunner Reporter can automatically capture and save screenshots during the
 
 The WebdriverIO Agent is fully integrated with the Zebrunner Launcher and requires even less configuration when used with it. The Zebrunner Launcher automatically provides `REPORTING_ENABLED`, `REPORTING_PROJECT_KEY`, `REPORTING_SERVER_HOSTNAME`, `REPORTING_SERVER_ACCESS_TOKEN` and some other environment variables, so there is no need to explicitly specify them or the corresponding `wdio.conf.js` file properties.
 
+#### Testing Platform and capabilities
+
 Moreover, the Zebrunner Agent will automatically substitute the Selenium server and capabilities configurations with the values selected in **Testing Platform** section in Zebrunner Launcher. For example, if you select **Zebrunner Selenium Grid** as a testing platform and select the `Linux` platform and the `Chrome 105.0` browser, the Zebrunner Agent will apply the following configuration on your `wdio.conf.js` file
 
 ```js
@@ -291,6 +293,12 @@ exports.config = {
 ```
 
 If the automatic substitution of properties and capabilities is not the desired behaviour, you can disable it by providing a special environment variable in Zebrunner Launcher - `REPORTING_RUN_SUBSTITUTE_REMOTE_WEB_DRIVERS`. When the value of the env var is `false`, the Zebrunner Agent will **not** substitute capabilities and Selenium server configurations.
+
+#### Custom capabilities
+
+If the automatic substitution of capabilities and Selenium server properties is enabled, you can specify custom capabilities for the launch directly from the Zebrunner Launcher. These capabilities will be applied to the project configuration before a driver session is created.
+
+If it is necessary to set a nested capability, you should append its name separated by a dot. For example, if you want the `enableVideo` capability to be nested within the `zebrunner:options` capability, you would specify the capability name as `zebrunner:options.enableVideo`.
 
 ## Collecting test logs
 

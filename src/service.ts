@@ -182,7 +182,17 @@ export class ZebrunnerService implements Services.ServiceInstance {
         if (isNotBlankString(capabilitiesString)) {
             const capabilitiesObject = JSON.parse(capabilitiesString);
             Object.keys(capabilitiesObject)
-                .forEach((key) => { capabilities[key] = capabilitiesObject[key]; });
+                .forEach((key: string) => {
+                    const keyParts = key.split('.');
+
+                    let capabilitiesNode = capabilities;
+                    for (let i = 0; i < keyParts.length - 1; i++) {
+                        const keyPart = keyParts[i];
+                        capabilitiesNode = capabilitiesNode[keyPart] = capabilitiesNode[keyPart] || {};
+                    }
+
+                    capabilitiesNode[keyParts[keyParts.length - 1]] = capabilitiesObject[key];
+                });
             delete capabilities.provider;
         }
     }
