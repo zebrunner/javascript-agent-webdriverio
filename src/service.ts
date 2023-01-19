@@ -140,7 +140,7 @@ export class ZebrunnerService implements Services.ServiceInstance {
 
         this.filterOutSpecsOnRerun(specs);
 
-        if (process.env.REPORTING_RUN_SUBSTITUTE_REMOTE_WEB_DRIVERS) {
+        if (process.env.REPORTING_RUN_SUBSTITUTE_REMOTE_WEB_DRIVERS === 'true') {
             ZebrunnerService.substituteHubProperties(config);
             ZebrunnerService.substituteCapabilities(capabilities);
         }
