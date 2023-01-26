@@ -152,6 +152,33 @@ The Zebrunner Reporter can automatically capture and save screenshots during the
 | `REPORTING_SCREENSHOT_AFTER_COMMANDS`<br/>`screenshot.afterCommands`   | A comma-separated list of WebdriverIO commands after which the Agent will take a screenshot of the browser or device. The default list of commands is `'click', 'doubleClick', 'navigateTo', 'elementClick', 'scroll', 'scrollIntoView'`. |
 | `REPORTING_SCREENSHOT_AFTER_ERROR`<br/>`screenshot.afterError`         | If the value is set to `true`, the Agent will automatically take a screenshot after every failed test. The default value is `true`.                                                                                                       |
 
+#### Test Case Management systems integration
+
+Zebrunner provides an ability to upload test results to external test case management systems (TCMs) on test run finish. For some TCMs it is possible to upload results in real-time during the test run execution.
+
+This functionality is currently supported for TestRail, Xray, Zephyr Squad and Zephyr Scale.
+
+##### TestRail
+
+| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
+|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_TESTRAIL_ENABLED`<br/>`tcmIntegration.testRail.enabled`  | Optional. Disables result upload. |
+| `REPORTING_TCM_TESTRAIL_SUITE_ID`<br/>`tcmIntegration.testRail.suiteId` | Mandatory. The method sets TestRail suite id for current test run. |
+| `REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN`<br/>`tcmIntegration.testRail.includeAllTestCasesInNewRun` | Optional. Includes all cases from suite into newly created run in TestRail. |
+| `REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.testRail.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
+| `REPORTING_TCM_TESTRAIL_RUN_ID`<br/>`tcmIntegration.testRail.runId` | Optional. Adds result into existing TestRail run. If not provided, test run is treated as new. |
+| `REPORTING_TCM_TESTRAIL_RUN_NAME`<br/>`tcmIntegration.testRail.runName` | Optional. Sets custom name for new TestRail run. By default, Zebrunner test run name is used. |
+| `REPORTING_TCM_TESTRAIL_MILESTONE`<br/>`tcmIntegration.testRail.milestone` | Optional. Adds result in TestRail milestone with the given name. |
+| `REPORTING_TCM_TESTRAIL_ASSIGNEE`<br/>`tcmIntegration.testRail.assignee` | Optional. Sets TestRail run assignee - should be email of existing TestRail user. |
+
+##### Xray
+
+| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
+|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_XRAY_ENABLED`<br/>`tcmIntegration.xray.enabled`  | Optional. Disables result upload. |
+| `REPORTING_TCM_XRAY_EXECUTION_KEY`<br/>`tcmIntegration.xray.executionKey` | Mandatory. The method sets Xray execution key. |
+| `REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.xray.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
+
 ### Examples
 
 === "Environment Variables"
@@ -184,6 +211,19 @@ The Zebrunner Reporter can automatically capture and save screenshots during the
     REPORTING_SCREENSHOT_BEFORE_COMMANDS=scroll
     REPORTING_SCREENSHOT_AFTER_COMMANDS=""
     REPORTING_SCREENSHOT_AFTER_ERROR=true
+
+    REPORTING_TCM_TESTRAIL_ENABLED=true
+    REPORTING_TCM_TESTRAIL_SUITE_ID=100
+    REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN=true
+    REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC=true
+    REPORTING_TCM_TESTRAIL_RUN_ID=500
+    REPORTING_TCM_TESTRAIL_RUN_NAME=Demo run
+    REPORTING_TCM_TESTRAIL_MILESTONE=Demo milestone
+    REPORTING_TCM_TESTRAIL_ASSIGNEE=tester@mycompany.com
+
+    REPORTING_TCM_XRAY_ENABLED=true
+    REPORTING_TCM_XRAY_EXECUTION_KEY=ZEB-1
+    REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC=true
     ```
 
 === "`wdio.conf.js` file"
@@ -235,6 +275,23 @@ The Zebrunner Reporter can automatically capture and save screenshots during the
                     slackChannels: 'dev, qa',
                     teamsChannels: 'dev-channel, management',
                     emails: 'manager@mycompany.com'
+                },
+                tcmIntegration: {
+                    testRail: {
+                        enabled: true,
+                        suiteId: "100",
+                        includeAllTestCasesInNewRun: true,
+                        enableRealTimeSync: true,
+                        runId: "500",
+                        runName: "Demo run",
+                        milestone: "Demo milestone",
+                        assignee: "tester@mycompany.com"
+                    },
+                    xray: {
+                        enabled: true,
+                        executionKey: "QT-100",
+                        enableRealTimeSync: true
+                    },
                 }
             }
         ]
@@ -486,3 +543,51 @@ describe('Test Suite', () => {
 ```
 
 It is worth mentioning that the method invocation does not affect the test execution, but simply unregisters the test in Zebrunner. To interrupt the test execution, you need to do additional actions, for example, throw an Error.
+
+## Upload test results to external test case management systems
+
+For successful upload of test run results to any Test Case Management system, 3 steps must be performed:
+
+1. Integration with TCM is configured and enabled for Zebrunner project;
+2. General TCM configuration is added using environment variables or `wdio.conf.js` file. To learn more, refer to [Test Case Management systems integration section](#test-case-management-systems-integration);
+3. TCM test cases are linked with specific WDIO tests:
+
+### Testrail
+
+```js
+const {currentTest} = require("@zebrunner/javascript-agent-webdriverio")
+
+describe('Test Suite', () => {
+
+    it('first test', () => {
+        currentTest.setTestRailCaseId("1000", "1001");  
+        // test code
+    })
+
+    it('second test', () => {
+        currentTest.setTestRailCaseId("1002");
+        // test code
+    })
+
+})
+```
+
+### Xray
+
+```js
+const {currentTest} = require("@zebrunner/javascript-agent-webdriverio")
+
+describe('Test Suite', () => {
+
+    it('first test', () => {
+        currentTest.setXrayTestKey("QT-1", "QT-2", "QT-3");
+        // test code
+    })
+
+    it('second test', () => {
+        currentTest.setXrayTestKey("QT-4");
+        // test code
+    })
+
+})
+```

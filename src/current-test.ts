@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer';
 import log from 'loglevel';
 import { EventNames } from './constant';
+import { testrailLabels, xrayLabels, zephyrLabels } from './constant/tcm-labels';
 import {
     isBuffer,
     isFunction,
@@ -85,5 +86,35 @@ export const currentTest = {
 
     revertRegistration: () => {
         (process.emit as Function)(EventNames.REVERT_TEST_REGISTRATION);
-    }
+    },
+
+    setTestRailCaseId: (...values: string[]) => {
+        values = values.filter((value) => isNotBlankString(value));
+
+        if (isNotEmptyArray(values)) {
+            (process.emit as Function)(EventNames.ATTACH_TEST_LABELS, testrailLabels.CASE_ID, values);
+        } else {
+            logger.warn(`You must provide at least one TestRail Case Id value.`);
+        }
+    },
+
+    setXrayTestKey: (...values: string[]) => {
+        values = values.filter((value) => isNotBlankString(value));
+
+        if (isNotEmptyArray(values)) {
+            (process.emit as Function)(EventNames.ATTACH_TEST_LABELS, xrayLabels.TEST_KEY, values);
+        } else {
+            logger.warn(`You must provide at least one Xray Test Key value.`);
+        }
+    },
+
+    setZephyrTestCaseKey: (...values: string[]) => {
+        values = values.filter((value) => isNotBlankString(value));
+
+        if (isNotEmptyArray(values)) {
+            (process.emit as Function)(EventNames.ATTACH_TEST_LABELS, zephyrLabels.TEST_CASE_KEY, values);
+        } else {
+            logger.warn(`You must provide at least one Zephyr Test Case Key value.`);
+        }
+    },
 };

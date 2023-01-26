@@ -19,6 +19,7 @@ import { Storage } from './storage';
 import { isNotBlankString, isNotEmptyArray } from './type-utils';
 import { Labels } from './constant/labels';
 import { currentTest } from './current-test';
+import { testrailLabels, xrayLabels, zephyrLabels } from './constant/tcm-labels';
 
 export class ZebrunnerService implements Services.ServiceInstance {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +41,7 @@ export class ZebrunnerService implements Services.ServiceInstance {
     }
 
     private initializeDependencies(config: TestrunnerOptions): ReportingConfig {
-        const { reporters } : { reporters?: ReporterEntry[] } = config;
+        const { reporters }: { reporters?: ReporterEntry[] } = config;
         const [, reporterConfig]: any = reporters.find((reporterAndConfig) => reporterAndConfig[0].name === ZebrunnerReporter.name);
 
         const reportingConfig = new ReportingConfig(reporterConfig);
@@ -100,10 +101,69 @@ export class ZebrunnerService implements Services.ServiceInstance {
         if (isNotBlankString(locale)) {
             labels.push({ key: Labels.LOCALE, value: locale });
         }
+
+        labels.push.apply(labels, this.getTestRunTCMLabels());
+
         if (isNotEmptyArray(labels)) {
             const request = AttachLabelsRequest.of(labels);
             await this.apiClient.attachTestRunLabels(this.storage.testRunId, request);
         }
+    }
+
+    private getTestRunTCMLabels() {
+        let labels = [];
+
+        const testRailConfig = this.reportingConfig.tcmIntegration?.testRail;
+        if (testRailConfig?.suiteId && isNotBlankString(testRailConfig?.suiteId)) {
+            labels.push({ key: testrailLabels.SUITE_ID, value: testRailConfig.suiteId });
+            if ('enabled' in testRailConfig) {
+                labels.push({ key: testrailLabels.SYNC_ENABLED, value: testRailConfig.enabled.toString() });
+            }
+            if ('includeAllTestCasesInNewRun' in testRailConfig) {
+                labels.push({ key: testrailLabels.INCLUDE_ALL, value: testRailConfig.includeAllTestCasesInNewRun.toString() });
+            }
+            if ('enableRealTimeSync' in testRailConfig) {
+                labels.push({ key: testrailLabels.SYNC_REAL_TIME, value: testRailConfig.enableRealTimeSync.toString() });
+            }
+            if (testRailConfig.runId) {
+                labels.push({ key: testrailLabels.RUN_ID, value: testRailConfig.runId });
+            }
+            if (testRailConfig.runName) {
+                labels.push({ key: testrailLabels.RUN_NAME, value: testRailConfig.runName });
+            }
+            if (testRailConfig.milestone) {
+                labels.push({ key: testrailLabels.MILESTONE, value: testRailConfig.milestone });
+            }
+            if (testRailConfig.assignee) {
+                labels.push({ key: testrailLabels.ASSIGNEE, value: testRailConfig.assignee });
+            }
+        }
+
+        const xrayConfig = this.reportingConfig.tcmIntegration?.xray;
+        if (xrayConfig?.executionKey && isNotBlankString(xrayConfig?.executionKey)) {
+            labels.push({ key: xrayLabels.EXECUTION_KEY, value: xrayConfig.executionKey });
+            if ('enabled' in xrayConfig) {
+                labels.push({ key: xrayLabels.SYNC_ENABLED, value: xrayConfig.enabled.toString() });
+            }
+            if ('enableRealTimeSync' in xrayConfig) {
+                labels.push({ key: xrayLabels.SYNC_REAL_TIME, value: xrayConfig.enableRealTimeSync.toString() });
+            }
+        }
+
+        const zephyrConfig = this.reportingConfig.tcmIntegration?.zephyr;
+        if (zephyrConfig?.testCycleKey && zephyrConfig?.jiraProjectKey
+            && isNotBlankString(zephyrConfig?.testCycleKey)
+            && isNotBlankString(zephyrConfig?.jiraProjectKey)) {
+            labels.push({ key: zephyrLabels.TEST_CYCLE_KEY, value: zephyrConfig.testCycleKey });
+            labels.push({ key: zephyrLabels.JIRA_PROJECT_KEY, value: zephyrConfig.jiraProjectKey });
+            if ('enabled' in zephyrConfig) {
+                labels.push({ key: zephyrLabels.SYNC_ENABLED, value: zephyrConfig.enabled.toString() });
+            }
+            if ('enableRealTimeSync' in zephyrConfig) {
+                labels.push({ key: zephyrLabels.SYNC_REAL_TIME, value: zephyrConfig.enableRealTimeSync.toString() });
+            }
+        }
+        return labels;
     }
 
     private saveTestRunArtifactReferences() {

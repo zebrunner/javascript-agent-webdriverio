@@ -75,13 +75,30 @@ exports.config = {
                 logs: {
                     pushDelayMillis: 5000,
                     includeLoggerName: true,
-                    excludeLoggers: 'webdriver'
+                    excludeLoggers: ['webdriver']
                 },
                 notifications: {
                     notifyOnEachFailure: false,
                     slackChannels: 'dev, qa',
                     teamsChannels: 'dev-channel, management',
                     emails: 'sbrenko@zebrunner.com'
+                },
+                tcmIntegration: {
+                    testRail: {
+                        enabled: true,
+                        suiteId: "100",
+                        includeAllTestCasesInNewRun: true,
+                        enableRealTimeSync: true,
+                        runId: "500",
+                        runName: "Demo run",
+                        milestone: "Demo milestone",
+                       assignee: "tester@mycompany.com"
+                    },
+                    xray: {
+                        enabled: true,
+                        executionKey: "QT-100",
+                        enableRealTimeSync: true
+                    },
                 }
             }
         ]

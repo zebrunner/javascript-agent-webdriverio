@@ -60,6 +60,42 @@ interface NotificationsConfig {
 
 }
 
+interface TestRail {
+
+    readonly enabled: boolean
+    readonly suiteId: string
+    readonly includeAllTestCasesInNewRun: boolean
+    readonly enableRealTimeSync: boolean
+    readonly runId: string
+    readonly runName: string
+    readonly milestone: string
+    readonly assignee: string
+
+}
+
+interface Xray {
+
+    readonly enabled: boolean
+    readonly executionKey: string
+    readonly enableRealTimeSync: boolean
+
+}
+
+interface Zephyr {
+
+    readonly enabled: boolean
+    readonly testCycleKey: string
+    readonly jiraProjectKey: string
+    readonly enableRealTimeSync: boolean
+
+}
+
+interface TCMConfig {
+    readonly testRail: TestRail
+    readonly xray: Xray
+    readonly zephyr: Zephyr
+}
+
 function getString(envVar: string, configValue: any, defaultValue: string = null): string {
     const value = process.env[envVar] as string;
 
@@ -148,6 +184,8 @@ export class ReportingConfig {
 
     readonly notifications: NotificationsConfig;
 
+    readonly tcmIntegration: TCMConfig;
+
     constructor(config: any) {
         this.enabled = getBoolean('REPORTING_ENABLED', config?.enabled);
         this.projectKey = getString('REPORTING_PROJECT_KEY', config?.projectKey, 'DEF');
@@ -193,6 +231,30 @@ export class ReportingConfig {
             slackChannels: getString('REPORTING_NOTIFICATION_SLACK_CHANNELS', config?.notifications?.slackChannels),
             teamsChannels: getString('REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS', config?.notifications?.teamsChannels),
             emails: getString('REPORTING_NOTIFICATION_EMAILS', config?.notifications?.emails),
+        };
+
+        this.tcmIntegration = {
+            testRail: {
+                enabled: getBoolean('REPORTING_TCM_TESTRAIL_ENABLED', config?.tcmIntegration?.testRail?.enabled),
+                suiteId: getString('REPORTING_TCM_TESTRAIL_SUITE_ID', config?.tcmIntegration?.testRail?.suiteId),
+                includeAllTestCasesInNewRun: getBoolean('REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN', config?.tcmIntegration?.testRail?.includeAllTestCasesInNewRun),
+                enableRealTimeSync: getBoolean('REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC', config?.tcmIntegration?.testRail?.enableRealTimeSync),
+                runId: getString('REPORTING_TCM_TESTRAIL_RUN_ID', config?.tcmIntegration?.testRail?.runId),
+                runName: getString('REPORTING_TCM_TESTRAIL_RUN_NAME', config?.tcmIntegration?.testRail?.runName),
+                milestone: getString('REPORTING_TCM_TESTRAIL_MILESTONE', config?.tcmIntegration?.testRail?.milestone),
+                assignee: getString('REPORTING_TCM_TESTRAIL_ASSIGNEE', config?.tcmIntegration?.testRail?.assignee),
+            },
+            xray: {
+                enabled: getBoolean('REPORTING_TCM_XRAY_ENABLED', config?.tcmIntegration?.xray?.enabled),
+                executionKey: getString('REPORTING_TCM_XRAY_EXECUTION_KEY', config?.tcmIntegration?.xray?.executionKey),
+                enableRealTimeSync: getBoolean('REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC', config?.tcmIntegration?.xray?.enableRealTimeSync),
+            },
+            zephyr: {
+                enabled: getBoolean('REPORTING_TCM_ZEPHYR_ENABLED', config?.tcmIntegration?.zephyr?.enabled),
+                testCycleKey: getString('REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY', config?.tcmIntegration?.zephyr?.testCycleKey),
+                jiraProjectKey: getString('REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY', config?.tcmIntegration?.zephyr?.jiraProjectKey),
+                enableRealTimeSync: getBoolean('REPORTING_TCM_ZEPHYR_ENABLE_REAL_TIME_SYNC', config?.tcmIntegration?.zephyr?.enableRealTimeSync),
+            }
         };
     }
 }

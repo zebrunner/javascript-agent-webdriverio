@@ -163,7 +163,7 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     private attachTestRunLabels(key: string, values: string[]) {
         return this.storage.trackOperationPromise(async () => {
-            if (this.storage.testId) {
+            if (this.storage.testRunId) {
                 const request = AttachLabelsRequest.ofSingleKey(key, values);
                 return this.apiClient.attachTestRunLabels(this.storage.testRunId, request);
             }
@@ -182,7 +182,7 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     private async attachTestRunArtifactReferences(name: string, value: string) {
         return this.storage.trackOperationPromise(async () => {
-            if (this.storage.testId) {
+            if (this.storage.testRunId) {
                 const request = AttachArtifactReferencesRequest.single(name, value);
                 return this.apiClient.attachTestRunArtifactReferences(this.storage.testRunId, request);
             }
