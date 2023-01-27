@@ -12,8 +12,12 @@ export { FinishTestRequest, TestFinishStatus } from './finish-test';
 export { FinishTestSessionRequest } from './finish-test-session';
 export { FinishTestRunRequest } from './finish-test-run';
 
+export { UpdateTcmConfigsRequest } from './update-tcm-configs';
+export { TcmType, TestCase, UpsertTestTestCases } from './upsert-test-test-cases';
+
 export { LogEntry } from './log-entry';
 export { Label } from './label';
+
 export { ArtifactReference } from './artifact-reference';
 export { UpdateTestRequest } from './update-test';
 export { AttachLabelsRequest } from './attach-labels';

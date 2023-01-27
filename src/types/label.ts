@@ -1,6 +1,6 @@
 export interface Label {
 
-    key: string
-    value: string
+    key: string;
+    value: string;
 
 }

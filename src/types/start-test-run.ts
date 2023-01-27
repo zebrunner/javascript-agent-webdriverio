@@ -6,33 +6,27 @@ export type Framework = 'webdriver.io'
 
 export interface NotificationTarget {
 
-    type: NotificationTargetType
-    value: string
+    type: NotificationTargetType;
+    value: string;
 
 }
 
 export class StartTestRunRequest {
+
     uuid?: string;
-
     name: string;
-
     startedAt: Date;
-
     status: TestRunStartStatus;
-
     framework: Framework;
-
     config?: {
         environment?: string
         build?: string
         treatSkipsAsFailures?: boolean
     };
-
     milestone?: {
         id?: number
         name?: string
     };
-
     notifications?: {
         notifyOnEachFailure?: boolean
         targets: NotificationTarget[]
@@ -56,10 +50,20 @@ export class StartTestRunRequest {
         this.notifications = {
             notifyOnEachFailure: reportingConfig.notifications.notifyOnEachFailure,
             targets: [
-                { type: 'SLACK_CHANNELS', value: reportingConfig.notifications.slackChannels } as NotificationTarget,
-                { type: 'MS_TEAMS_CHANNELS', value: reportingConfig.notifications.teamsChannels } as NotificationTarget,
-                { type: 'EMAIL_RECIPIENTS', value: reportingConfig.notifications.emails } as NotificationTarget,
+                {
+                    type: 'SLACK_CHANNELS',
+                    value: reportingConfig.notifications.slackChannels
+                } as NotificationTarget,
+                {
+                    type: 'MS_TEAMS_CHANNELS',
+                    value: reportingConfig.notifications.teamsChannels
+                } as NotificationTarget,
+                {
+                    type: 'EMAIL_RECIPIENTS',
+                    value: reportingConfig.notifications.emails
+                } as NotificationTarget,
             ].filter((value) => value.value),
         };
     }
+
 }

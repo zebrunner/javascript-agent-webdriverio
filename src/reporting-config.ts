@@ -10,90 +10,116 @@ const screenshotAfterCommands: string[] = ['click', 'doubleClick', 'navigateTo',
 
 interface ServerConfig {
 
-    readonly hostname: string
-    readonly accessToken: string
+    readonly hostname: string;
+    readonly accessToken: string;
 
 }
 
 interface LaunchConfig {
 
-    readonly context: string
-    readonly displayName: string
-    readonly build: string
-    readonly environment: string
-    readonly locale: string
-    readonly treatSkipsAsFailures: boolean
-    readonly labels: Label[]
-    readonly artifactReferences: ArtifactReference[]
+    readonly context: string;
+    readonly displayName: string;
+    readonly build: string;
+    readonly environment: string;
+    readonly locale: string;
+    readonly treatSkipsAsFailures: boolean;
+    readonly labels: Label[];
+    readonly artifactReferences: ArtifactReference[];
 
 }
 
 interface MilestoneConfig {
 
-    readonly id: number
-    readonly name: string
+    readonly id: number;
+    readonly name: string;
 
 }
 
 export interface LogsConfig {
 
-    readonly pushDelayMillis: number
-    readonly includeLoggerName: boolean
-    readonly excludeLoggers: Set<string>
+    readonly pushDelayMillis: number;
+    readonly includeLoggerName: boolean;
+    readonly excludeLoggers: Set<string>;
 
 }
 
 export interface ScreenshotConfig {
 
-    readonly afterError: boolean
-    readonly beforeCommands: Set<string>
-    readonly afterCommands: Set<string>
+    readonly afterError: boolean;
+    readonly beforeCommands: Set<string>;
+    readonly afterCommands: Set<string>;
 
 }
 
 interface NotificationsConfig {
 
-    readonly notifyOnEachFailure: boolean
-    readonly slackChannels: string
-    readonly teamsChannels: string
-    readonly emails: string
+    readonly notifyOnEachFailure: boolean;
+
+    readonly slackChannels: string;
+    readonly teamsChannels: string;
+    readonly emails: string;
 
 }
 
-interface TestRail {
+interface Tcm {
 
-    readonly enabled: boolean
-    readonly suiteId: string
-    readonly includeAllTestCasesInNewRun: boolean
-    readonly enableRealTimeSync: boolean
-    readonly runId: string
-    readonly runName: string
-    readonly milestone: string
-    readonly assignee: string
+    readonly testCaseStatus: TestCaseStatus;
+
+    readonly zebrunner: ZebrunnerTcm;
+    readonly testRail: TestRailTcm;
+    readonly xray: XrayTcm;
+    readonly zephyr: ZephyrTcm;
 
 }
 
-interface Xray {
+interface TestCaseStatus {
 
-    readonly enabled: boolean
-    readonly executionKey: string
-    readonly enableRealTimeSync: boolean
-
-}
-
-interface Zephyr {
-
-    readonly enabled: boolean
-    readonly testCycleKey: string
-    readonly jiraProjectKey: string
-    readonly enableRealTimeSync: boolean
+    readonly onPass: string;
+    readonly onFail: string;
 
 }
 
-interface TCMConfig {
-    readonly testRail: TestRail
-    readonly xray: Xray
-    readonly zephyr: Zephyr
+interface ZebrunnerTcm {
+
+    readonly pushResults: boolean;
+    readonly pushInRealTime: boolean;
+
+    readonly testRunId: number;
+
+}
+
+interface TestRailTcm {
+
+    readonly pushResults: boolean;
+    readonly pushInRealTime: boolean;
+
+    readonly suiteId: number;
+    readonly runId: number;
+
+    readonly includeAllTestCasesInNewRun: boolean;
+    readonly runName: string;
+    readonly milestoneName: string;
+    readonly assignee: string;
+
+}
+
+interface XrayTcm {
+
+    readonly pushResults: boolean;
+    readonly pushInRealTime: boolean;
+
+    readonly executionKey: string;
+
+}
+
+interface ZephyrTcm {
+
+    readonly pushResults: boolean;
+    readonly pushInRealTime: boolean;
+
+    readonly jiraProjectKey: string;
+    readonly testCycleKey: string;
+
 }
 
 function getString(envVar: string, configValue: any, defaultValue: string = null): string {
@@ -121,7 +147,8 @@ function getNumber(envVar: string, configValue: any, defaultValue: number = null
 
 function tokenizeString(value: string, defaultTokens: string[] = []): string[] {
     return isNotBlankString(value)
-        ? value.split(',').map((val) => val.trim())
+        ? value.split(',')
+            .map((val) => val.trim())
         : defaultTokens;
 }
 
@@ -150,7 +177,10 @@ function parseLabels(config: any): Label[] {
             }
             return isNotBlank;
         })
-        .map((key) => ({ key, value: labels[key] }));
+        .map((key) => ({
+            key,
+            value: labels[key]
+        }));
 }
 
 function parseArtifactReferences(config: any): ArtifactReference[] {
@@ -164,27 +194,23 @@ function parseArtifactReferences(config: any): ArtifactReference[] {
             }
             return isNotBlank;
         })
-        .map((name) => ({ name, value: artifactReferences[name] }));
+        .map((name) => ({
+            name,
+            value: artifactReferences[name]
+        }));
 }
 
 export class ReportingConfig {
+
     readonly enabled: boolean;
-
     readonly projectKey: string;
-
     readonly server: ServerConfig;
-
     readonly launch: LaunchConfig;
-
     readonly milestone: MilestoneConfig;
-
     readonly logs: LogsConfig;
-
     readonly screenshot: ScreenshotConfig;
-
     readonly notifications: NotificationsConfig;
-
-    readonly tcmIntegration: TCMConfig;
+    readonly tcm: Tcm;
 
     constructor(config: any) {
         this.enabled = getBoolean('REPORTING_ENABLED', config?.enabled);
@@ -233,28 +259,38 @@ export class ReportingConfig {
             emails: getString('REPORTING_NOTIFICATION_EMAILS', config?.notifications?.emails),
         };
 
-        this.tcmIntegration = {
+        this.tcm = {
+            testCaseStatus: {
+                onPass: getString('REPORTING_TCM_TEST_CASE_STATUS_ON_PASS', config?.tcm?.testCaseStatus?.onPass),
+                onFail: getString('REPORTING_TCM_TEST_CASE_STATUS_ON_FAIL', config?.tcm?.testCaseStatus?.onFail),
+            },
+            zebrunner: {
+                pushResults: getBoolean('REPORTING_TCM_ZEBRUNNER_PUSH_RESULTS', config?.tcm?.zebrunner?.pushResults),
+                pushInRealTime: getBoolean('REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME', config?.tcm?.zebrunner?.pushResults),
+                testRunId: getNumber('REPORTING_TCM_ZEBRUNNER_TEST_RUN_ID', config?.tcm?.zebrunner?.testRunId),
+            },
             testRail: {
-                enabled: getBoolean('REPORTING_TCM_TESTRAIL_ENABLED', config?.tcmIntegration?.testRail?.enabled),
-                suiteId: getString('REPORTING_TCM_TESTRAIL_SUITE_ID', config?.tcmIntegration?.testRail?.suiteId),
-                includeAllTestCasesInNewRun: getBoolean('REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN', config?.tcmIntegration?.testRail?.includeAllTestCasesInNewRun),
-                enableRealTimeSync: getBoolean('REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC', config?.tcmIntegration?.testRail?.enableRealTimeSync),
-                runId: getString('REPORTING_TCM_TESTRAIL_RUN_ID', config?.tcmIntegration?.testRail?.runId),
-                runName: getString('REPORTING_TCM_TESTRAIL_RUN_NAME', config?.tcmIntegration?.testRail?.runName),
-                milestone: getString('REPORTING_TCM_TESTRAIL_MILESTONE', config?.tcmIntegration?.testRail?.milestone),
-                assignee: getString('REPORTING_TCM_TESTRAIL_ASSIGNEE', config?.tcmIntegration?.testRail?.assignee),
+                pushResults: getBoolean('REPORTING_TCM_TESTRAIL_PUSH_RESULTS', config?.tcm?.testRail?.pushResults),
+                pushInRealTime: getBoolean('REPORTING_TCM_TESTRAIL_PUSH_IN_REAL_TIME', config?.tcm?.testRail?.pushInRealTime),
+                suiteId: getNumber('REPORTING_TCM_TESTRAIL_SUITE_ID', config?.tcm?.testRail?.suiteId),
+                runId: getNumber('REPORTING_TCM_TESTRAIL_RUN_ID', config?.tcm?.testRail?.runId),
+                includeAllTestCasesInNewRun: getBoolean('REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN', config?.tcm?.testRail?.includeAllTestCasesInNewRun),
+                runName: getString('REPORTING_TCM_TESTRAIL_RUN_NAME', config?.tcm?.testRail?.runName),
+                milestoneName: getString('REPORTING_TCM_TESTRAIL_MILESTONE_NAME', config?.tcm?.testRail?.milestoneName),
+                assignee: getString('REPORTING_TCM_TESTRAIL_ASSIGNEE', config?.tcm?.testRail?.assignee),
             },
             xray: {
-                enabled: getBoolean('REPORTING_TCM_XRAY_ENABLED', config?.tcmIntegration?.xray?.enabled),
-                executionKey: getString('REPORTING_TCM_XRAY_EXECUTION_KEY', config?.tcmIntegration?.xray?.executionKey),
-                enableRealTimeSync: getBoolean('REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC', config?.tcmIntegration?.xray?.enableRealTimeSync),
+                pushResults: getBoolean('REPORTING_TCM_XRAY_PUSH_RESULTS', config?.tcm?.xray?.pushResults),
+                pushInRealTime: getBoolean('REPORTING_TCM_XRAY_PUSH_IN_REAL_TIME', config?.tcm?.xray?.pushInRealTime),
+                executionKey: getString('REPORTING_TCM_XRAY_EXECUTION_KEY', config?.tcm?.xray?.executionKey),
             },
             zephyr: {
-                enabled: getBoolean('REPORTING_TCM_ZEPHYR_ENABLED', config?.tcmIntegration?.zephyr?.enabled),
-                testCycleKey: getString('REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY', config?.tcmIntegration?.zephyr?.testCycleKey),
-                jiraProjectKey: getString('REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY', config?.tcmIntegration?.zephyr?.jiraProjectKey),
-                enableRealTimeSync: getBoolean('REPORTING_TCM_ZEPHYR_ENABLE_REAL_TIME_SYNC', config?.tcmIntegration?.zephyr?.enableRealTimeSync),
+                pushResults: getBoolean('REPORTING_TCM_ZEPHYR_PUSH_RESULTS', config?.tcm?.zephyr?.pushResults),
+                pushInRealTime: getBoolean('REPORTING_TCM_ZEPHYR_PUSH_IN_REAL_TIME', config?.tcm?.zephyr?.pushInRealTime),
+                jiraProjectKey: getString('REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY', config?.tcm?.zephyr?.jiraProjectKey),
+                testCycleKey: getString('REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY', config?.tcm?.zephyr?.testCycleKey),
             }
         };
     }
+
 }

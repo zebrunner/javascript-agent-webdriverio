@@ -16,14 +16,16 @@ import {
     StartTestRequest,
     StartTestRunRequest,
     StartTestSessionRequest,
+    UpdateTcmConfigsRequest,
     UpdateTestRequest,
+    UpsertTestTestCases,
 } from './types';
 
 export class ApiClient {
+
     private readonly logger = log.getLogger('zebrunner.api-client');
 
     private readonly accessToken: string;
-
     private readonly axiosInstance: AxiosInstance;
 
     constructor(reportingConfig: ReportingConfig) {
@@ -49,7 +51,10 @@ export class ApiClient {
             return config;
         }, (error) => error);
         this.axiosInstance.interceptors.response.use((response) => response, (error) => {
-            const { request, response } = error;
+            const {
+                request,
+                response
+            } = error;
 
             let errorMessage = '';
             if (request) {
@@ -171,4 +176,13 @@ export class ApiClient {
             return this.axiosInstance.put(ZebrunnerPaths.ATTACH_TEST_ARTIFACT_REFERENCES(testRunId, testId), request);
         }
     }
+
+    async updateTcmConfigs(testRunId: number, request: UpdateTcmConfigsRequest): Promise<void> {
+        return this.axiosInstance.patch(ZebrunnerPaths.UPDATE_TCM_CONFIGS(testRunId), request);
+    }
+
+    async upsertTestTestCases(testRunId: number, testId: number, request: UpsertTestTestCases): Promise<void> {
+        return this.axiosInstance.post(ZebrunnerPaths.UPSERT_TEST_TEST_CASES(testRunId, testId), request);
+    }
+
 }

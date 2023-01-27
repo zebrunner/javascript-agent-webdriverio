@@ -1,18 +1,13 @@
 import { TestStats } from '@wdio/reporter';
 
 export class StartTestRequest {
+
     name: string;
-
     className: string;
-
     methodName: string;
-
     argumentsIndex?: number;
-
     startedAt: Date;
-
     maintainer?: string;
-
     correlationData?: string;
 
     constructor(testStats: TestStats, spec: string, correlationData: string) {
@@ -22,4 +17,5 @@ export class StartTestRequest {
         this.startedAt = new Date();
         this.correlationData = correlationData;
     }
+
 }

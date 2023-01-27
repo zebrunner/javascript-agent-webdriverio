@@ -1,4 +1,7 @@
-const { ZebrunnerReporter, ZebrunnerService } = require('./build/index')
+const {
+    ZebrunnerReporter,
+    ZebrunnerService
+} = require('./build/index');
 
 exports.config = {
     reporterSyncInterval: 10 * 1000,
@@ -19,10 +22,10 @@ exports.config = {
         // 'path/to/excluded/files'
     ],
 
-    maxInstances: 5,
+    maxInstances: 1,
     capabilities: [
         {
-            maxInstances: 5,
+            maxInstances: 1,
             browserName: 'chrome',
         },
     ],
@@ -83,27 +86,36 @@ exports.config = {
                     teamsChannels: 'dev-channel, management',
                     emails: 'sbrenko@zebrunner.com'
                 },
-                tcmIntegration: {
+                tcm: {
+                    testCaseStatus: {
+                        onPass: 'SUCCESS',
+                        onFail: '',
+                    },
+                    zebrunner: {
+                        pushResults: false,
+                        pushInRealTime: true,
+                        testRunId: 42
+                    },
                     testRail: {
-                        enabled: false,
-                        suiteId: "100",
+                        pushResults: false,
+                        pushInRealTime: true,
+                        suiteId: 100,
+                        runId: 500,
                         includeAllTestCasesInNewRun: true,
-                        enableRealTimeSync: true,
-                        runId: "500",
-                        runName: "Demo run",
-                        milestone: "Demo milestone",
-                        assignee: "tester@mycompany.com"
+                        runName: 'New Demo Run',
+                        milestoneName: 'Demo Milestone',
+                        assignee: 'tester@mycompany.com'
                     },
                     xray: {
-                        enabled: false,
-                        executionKey: "QT-100",
-                        enableRealTimeSync: true
+                        pushResults: false,
+                        pushInRealTime: true,
+                        executionKey: 'QT-100'
                     },
                     zephyr: {
-                        enabled: false,
-                        testCycleKey: "ZEB-T1",
-                        jiraProjectKey: "ZEB",
-                        enableRealTimeSync: true
+                        pushResults: false,
+                        pushInRealTime: true,
+                        jiraProjectKey: 'ZEB',
+                        testCycleKey: 'ZEB-T1'
                     }
                 }
             }
@@ -115,4 +127,4 @@ exports.config = {
         ui: 'bdd',
         timeout: 120000,
     }
-}
+};

@@ -1,20 +1,14 @@
 export type TestSessionStartStatus = 'RUNNING' | 'FAILED'
 
 export class StartTestSessionRequest {
+
     sessionId?: string;
-
     initiatedAt: Date;
-
     startedAt?: Date;
-
     failureReason?: string;
-
     status: TestSessionStartStatus;
-
     desiredCapabilities: any;
-
     capabilities: any;
-
     testIds?: number[];
 
     static running(browser: any, desiredCapabilities: any, testId?: number): StartTestSessionRequest {
@@ -37,4 +31,5 @@ export class StartTestSessionRequest {
             capabilities: {},
         };
     }
+
 }

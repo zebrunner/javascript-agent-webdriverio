@@ -5,18 +5,15 @@ import { LogLevelLogsCollector } from './log-level-logs-collector';
 import { LogsConfig } from './reporting-config';
 
 export class LogsManager {
-    private readonly storage: Storage;
 
+    private readonly storage: Storage;
     private readonly apiClient: ApiClient;
 
     private readonly logsConfig: LogsConfig;
-
     private readonly logs: LogEntry[] = [];
 
     private timerId: any;
-
     private stopped = false;
-
     private currentLogsSending: Promise<any>;
 
     constructor(storage: Storage) {
@@ -67,4 +64,5 @@ export class LogsManager {
         await this.currentLogsSending;
         return this.sendLogs();
     }
+
 }

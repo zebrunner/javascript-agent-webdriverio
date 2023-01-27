@@ -2,24 +2,19 @@ type RunMode = 'NEW' | 'RERUN'
 
 export interface Test {
 
-    readonly id: number
-    readonly correlationData: string
+    readonly id: number;
+    readonly correlationData: string;
 
 }
 
 export class ExchangedRunContext {
+
     testRunUuid: string;
-
     mode: RunMode;
-
     runAllowed: boolean;
-
     reason: string;
-
     runOnlySpecificTests: boolean;
-
     testsToRun: Test[];
-
     fullExecutionPlanContext: string;
 
     constructor(response: any) {
@@ -34,4 +29,5 @@ export class ExchangedRunContext {
 
         this.fullExecutionPlanContext = response.fullExecutionPlanContext;
     }
+
 }
