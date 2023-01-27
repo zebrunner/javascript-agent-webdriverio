@@ -119,11 +119,15 @@ export class ZebrunnerService implements Services.ServiceInstance {
             if ('enabled' in testRailConfig) {
                 labels.push({ key: testrailLabels.SYNC_ENABLED, value: testRailConfig.enabled.toString() });
             }
-            if ('includeAllTestCasesInNewRun' in testRailConfig) {
-                labels.push({ key: testrailLabels.INCLUDE_ALL, value: testRailConfig.includeAllTestCasesInNewRun.toString() });
-            }
             if ('enableRealTimeSync' in testRailConfig) {
                 labels.push({ key: testrailLabels.SYNC_REAL_TIME, value: testRailConfig.enableRealTimeSync.toString() });
+                if (testRailConfig.enableRealTimeSync === true) {
+                    labels.push({ key: testrailLabels.INCLUDE_ALL, value: true });
+                }
+            }
+            if ('includeAllTestCasesInNewRun' in testRailConfig
+                && labels.filter(obj => obj.key === testrailLabels.INCLUDE_ALL).length === 0) {
+                labels.push({ key: testrailLabels.INCLUDE_ALL, value: testRailConfig.includeAllTestCasesInNewRun.toString() });
             }
             if (testRailConfig.runId) {
                 labels.push({ key: testrailLabels.RUN_ID, value: testRailConfig.runId });

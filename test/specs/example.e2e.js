@@ -9,6 +9,7 @@ describe('My Login application', () => {
     it('should login with valid credentials', async () => {
         currentTest.setTestRailCaseId("3435", "3438");
         currentTest.setXrayTestKey("QT-2", "QT-10", "QT-11");
+        currentTest.setZephyrTestCaseKey("ZEB-T3", "ZEB-T6", "ZEB-T2");
         currentTest.attachLabel("some key", "one", "two", "three");
 
         await browser.url(`https://the-internet.herokuapp.com/login`)
@@ -24,6 +25,7 @@ describe('My Login application', () => {
     it('should fail with invalid credentials', async () => {
         currentTest.setTestRailCaseId("3436");
         currentTest.setXrayTestKey("QT-10");
+        currentTest.setZephyrTestCaseKey("ZEB-T7");
         currentTest.attachLabel("reason", "invalid creds");
 
         await browser.url(`https://the-internet.herokuapp.com/login`)
@@ -39,6 +41,7 @@ describe('My Login application', () => {
     it.skip('should skip', async () => {
         currentTest.setTestRailCaseId("3437");
         currentTest.setXrayTestKey("QT-11");
+        currentTest.setZephyrTestCaseKey("ZEB-T4");
         currentTest.attachLabel("reason", "skip");
     })
 

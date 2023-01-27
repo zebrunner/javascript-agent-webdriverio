@@ -15,7 +15,7 @@ const logger = log.getLogger('zebrunner');
 export const currentTest = {
     setMaintainer: (maintainer) => {
         if (!isNotBlankString(maintainer)) {
-            logger.warn(`Maintainer must a not blank string. Provided value is '${maintainer}'`);
+            logger.warn(`Maintainer must be a not blank string. Provided value is '${maintainer}'`);
         }
 
         (process.emit as Function)(EventNames.SET_TEST_MAINTAINER, maintainer);

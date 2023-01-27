@@ -1,4 +1,4 @@
-const {ZebrunnerReporter, ZebrunnerService} = require('./build/index')
+const { ZebrunnerReporter, ZebrunnerService } = require('./build/index')
 
 exports.config = {
     reporterSyncInterval: 10 * 1000,
@@ -85,20 +85,26 @@ exports.config = {
                 },
                 tcmIntegration: {
                     testRail: {
-                        enabled: true,
+                        enabled: false,
                         suiteId: "100",
                         includeAllTestCasesInNewRun: true,
                         enableRealTimeSync: true,
                         runId: "500",
                         runName: "Demo run",
                         milestone: "Demo milestone",
-                       assignee: "tester@mycompany.com"
+                        assignee: "tester@mycompany.com"
                     },
                     xray: {
-                        enabled: true,
+                        enabled: false,
                         executionKey: "QT-100",
                         enableRealTimeSync: true
                     },
+                    zephyr: {
+                        enabled: false,
+                        testCycleKey: "ZEB-T1",
+                        jiraProjectKey: "ZEB",
+                        enableRealTimeSync: true
+                    }
                 }
             }
         ]

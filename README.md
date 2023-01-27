@@ -165,7 +165,7 @@ This functionality is currently supported for TestRail, Xray, Zephyr Squad and Z
 | `REPORTING_TCM_TESTRAIL_ENABLED`<br/>`tcmIntegration.testRail.enabled`  | Optional. Disables result upload. |
 | `REPORTING_TCM_TESTRAIL_SUITE_ID`<br/>`tcmIntegration.testRail.suiteId` | Mandatory. The method sets TestRail suite id for current test run. |
 | `REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN`<br/>`tcmIntegration.testRail.includeAllTestCasesInNewRun` | Optional. Includes all cases from suite into newly created run in TestRail. |
-| `REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.testRail.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
+| `REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.testRail.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. Enabling of this option sets automatically `includeAllTestCasesInNewRun` to `true` as well. |
 | `REPORTING_TCM_TESTRAIL_RUN_ID`<br/>`tcmIntegration.testRail.runId` | Optional. Adds result into existing TestRail run. If not provided, test run is treated as new. |
 | `REPORTING_TCM_TESTRAIL_RUN_NAME`<br/>`tcmIntegration.testRail.runName` | Optional. Sets custom name for new TestRail run. By default, Zebrunner test run name is used. |
 | `REPORTING_TCM_TESTRAIL_MILESTONE`<br/>`tcmIntegration.testRail.milestone` | Optional. Adds result in TestRail milestone with the given name. |
@@ -178,6 +178,15 @@ This functionality is currently supported for TestRail, Xray, Zephyr Squad and Z
 | `REPORTING_TCM_XRAY_ENABLED`<br/>`tcmIntegration.xray.enabled`  | Optional. Disables result upload. |
 | `REPORTING_TCM_XRAY_EXECUTION_KEY`<br/>`tcmIntegration.xray.executionKey` | Mandatory. The method sets Xray execution key. |
 | `REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.xray.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
+
+##### Zephyr
+
+| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
+|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_ZEPHYR_ENABLED`<br/>`tcmIntegration.zephyr.enabled`  | Optional. Disables result upload. |
+| `REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY`<br/>`tcmIntegration.zephyr.testCycleKey` | Mandatory. The method sets Zephyr test cycle key. |
+| `REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY`<br/>`tcmIntegration.zephyr.jiraProjectKey` | Mandatory. Sets Zephyr Jira project key. |
+| `REPORTING_TCM_ZEPHYR_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.zephyr.enableRealTimeSync`  | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
 
 ### Examples
 
@@ -224,6 +233,11 @@ This functionality is currently supported for TestRail, Xray, Zephyr Squad and Z
     REPORTING_TCM_XRAY_ENABLED=true
     REPORTING_TCM_XRAY_EXECUTION_KEY=ZEB-1
     REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC=true
+
+    REPORTING_TCM_ZEPHYR_ENABLED=true
+    REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY=ZEB-T1
+    REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY=ZEB
+    REPORTING_TCM_ZEPHYR_ENABLE_REAL_TIME_SYNC=true
     ```
 
 === "`wdio.conf.js` file"
@@ -292,6 +306,12 @@ This functionality is currently supported for TestRail, Xray, Zephyr Squad and Z
                         executionKey: "QT-100",
                         enableRealTimeSync: true
                     },
+                    zephyr: {
+                        enabled: true,
+                        testCycleKey: "ZEB-T1",
+                        jiraProjectKey: "ZEB",
+                        enableRealTimeSync: true
+                    }
                 }
             }
         ]
@@ -586,6 +606,26 @@ describe('Test Suite', () => {
 
     it('second test', () => {
         currentTest.setXrayTestKey("QT-4");
+        // test code
+    })
+
+})
+```
+
+### Zephyr
+
+```js
+const {currentTest} = require("@zebrunner/javascript-agent-webdriverio")
+
+describe('Test Suite', () => {
+
+    it('first test', () => {
+        currentTest.setZephyrTestCaseKey("ZEB-T1", "ZEB-T2", "ZEB-T3");
+        // test code
+    })
+
+    it('second test', () => {
+        currentTest.setZephyrTestCaseKey("ZEB-T4");
         // test code
     })
 
