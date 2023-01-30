@@ -5,6 +5,7 @@ import { isNotBlankString, isNotEmptyArray } from './type-utils';
 const logger = log.getLogger('zebrunner');
 
 export const currentLaunch = {
+
     attachLabel: (key: string, ...values: string[]) => {
         if (!isNotBlankString(key)) {
             logger.warn(`Label key must be a not blank string. Provided value is '${key}'`);

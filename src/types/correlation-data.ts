@@ -1,6 +1,6 @@
 export class CorrelationData {
-    spec: string;
 
+    spec: string;
     fullTitle: string;
 
     constructor(
@@ -19,4 +19,5 @@ export class CorrelationData {
         const parsedObject: any = JSON.parse(string);
         return new CorrelationData(parsedObject.spec, parsedObject.fullTitle);
     }
+
 }

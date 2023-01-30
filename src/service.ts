@@ -14,6 +14,7 @@ import {
     FinishTestSessionRequest,
     StartTestRunRequest,
     StartTestSessionRequest,
+    UpdateTcmConfigsRequest,
 } from './types';
 import { Storage } from './storage';
 import { isNotBlankString, isNotEmptyArray } from './type-utils';
@@ -40,7 +41,7 @@ export class ZebrunnerService implements Services.ServiceInstance {
     }
 
     private initializeDependencies(config: TestrunnerOptions): ReportingConfig {
-        const { reporters } : { reporters?: ReporterEntry[] } = config;
+        const { reporters }: { reporters?: ReporterEntry[] } = config;
         const [, reporterConfig]: any = reporters.find((reporterAndConfig) => reporterAndConfig[0].name === ZebrunnerReporter.name);
 
         const reportingConfig = new ReportingConfig(reporterConfig);
@@ -85,6 +86,7 @@ export class ZebrunnerService implements Services.ServiceInstance {
         const runUuid = await this.initializeRunContext();
 
         await this.startTestRun(runUuid);
+        await this.saveTcmConfigs();
         await this.saveTestRunLabels();
         return this.saveTestRunArtifactReferences();
     }
@@ -94,12 +96,23 @@ export class ZebrunnerService implements Services.ServiceInstance {
         this.storage.testRunId = await this.apiClient.startTestRun(this.reportingConfig.projectKey, request);
     }
 
+    private async saveTcmConfigs() {
+        const request = new UpdateTcmConfigsRequest(this.reportingConfig);
+        if (request.hasAnyValue) {
+            return this.apiClient.updateTcmConfigs(this.storage.testRunId, request);
+        }
+    }
+
     private async saveTestRunLabels() {
         const labels = this.reportingConfig.launch.labels || [];
         const { locale } = this.reportingConfig.launch;
         if (isNotBlankString(locale)) {
-            labels.push({ key: Labels.LOCALE, value: locale });
+            labels.push({
+                key: Labels.LOCALE,
+                value: locale
+            });
         }
+
         if (isNotEmptyArray(labels)) {
             const request = AttachLabelsRequest.of(labels);
             await this.apiClient.attachTestRunLabels(this.storage.testRunId, request);
@@ -248,4 +261,5 @@ export class ZebrunnerService implements Services.ServiceInstance {
             return currentTest.saveScreenshot(this.browser);
         }
     }
+
 }

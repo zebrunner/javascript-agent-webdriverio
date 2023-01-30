@@ -1,20 +1,15 @@
 import { Buffer } from 'buffer';
 import log from 'loglevel';
 import { EventNames } from './constant';
-import {
-    isBuffer,
-    isFunction,
-    isNotBlankString,
-    isNotEmptyArray,
-    isPromise,
-} from './type-utils';
+import { isBuffer, isFunction, isNotBlankString, isNotEmptyArray, isPromise, } from './type-utils';
 
 const logger = log.getLogger('zebrunner');
 
 export const currentTest = {
+
     setMaintainer: (maintainer) => {
         if (!isNotBlankString(maintainer)) {
-            logger.warn(`Maintainer must a not blank string. Provided value is '${maintainer}'`);
+            logger.warn(`Maintainer must be a not blank string. Provided value is '${maintainer}'`);
         }
 
         (process.emit as Function)(EventNames.SET_TEST_MAINTAINER, maintainer);
@@ -85,5 +80,6 @@ export const currentTest = {
 
     revertRegistration: () => {
         (process.emit as Function)(EventNames.REVERT_TEST_REGISTRATION);
-    }
+    },
+
 };

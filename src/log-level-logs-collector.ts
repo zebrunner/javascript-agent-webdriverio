@@ -2,6 +2,7 @@ import log from 'loglevel';
 import util from 'util';
 
 export class LogLevelLogsCollector {
+
     private readonly messageCollector: (loggerName: string, logLevel: string, message: string) => Promise<void>;
 
     constructor(messageCollector: (loggerName: string, logLevel: string, message: string) => Promise<void>) {
@@ -30,4 +31,5 @@ export class LogLevelLogsCollector {
         // to re-initialize logger methods
         logger.setLevel(logger.getLevel());
     }
+
 }

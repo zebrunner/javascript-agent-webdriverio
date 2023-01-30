@@ -10,21 +10,23 @@ import {
     FinishTestRequest,
     LinkTestsAndTestSessionRequest,
     StartTestRequest,
+    TestCase,
     TestFinishStatus,
     UpdateTestRequest,
+    UpsertTestTestCases,
 } from './types';
 import { EventNames } from './constant';
 import { Storage } from './storage';
 import { LogsManager } from './logs-manager';
+import { isNotBlankString } from './type-utils';
 
 export class ZebrunnerReporter extends WDIOReporter {
-    private readonly storage: Storage;
-
-    private readonly apiClient: ApiClient;
-
-    private readonly logsManager: LogsManager;
 
     private readonly log = log.getLogger('zebrunner');
+
+    private readonly storage: Storage;
+    private readonly apiClient: ApiClient;
+    private readonly logsManager: LogsManager;
 
     private allEventsReportedToZebrunner: boolean;
 
@@ -53,14 +55,16 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     private registerActionListeners() {
         process.on(EventNames.SET_TEST_MAINTAINER, this.setTestMaintainer.bind(this));
-        process.on(EventNames.ATTACH_TEST_LABELS, this.attachTestLabels.bind(this));
-        process.on(EventNames.ATTACH_TEST_ARTIFACT_REFERENCES, this.attachTestArtifactReferences.bind(this));
         process.on(EventNames.REVERT_TEST_REGISTRATION, this.revertTestRegistration.bind(this));
 
-        process.on(EventNames.SAVE_TEST_SCREENSHOT_BUFFER, this.saveScreenshotBuffer.bind(this));
-
         process.on(EventNames.ATTACH_TEST_RUN_LABELS, this.attachTestRunLabels.bind(this));
+        process.on(EventNames.ATTACH_TEST_LABELS, this.attachTestLabels.bind(this));
+
         process.on(EventNames.ATTACH_TEST_RUN_ARTIFACT_REFERENCES, this.attachTestRunArtifactReferences.bind(this));
+        process.on(EventNames.ATTACH_TEST_ARTIFACT_REFERENCES, this.attachTestArtifactReferences.bind(this));
+
+        process.on(EventNames.SAVE_TEST_SCREENSHOT_BUFFER, this.saveScreenshotBuffer.bind(this));
+        process.on(EventNames.ADD_TEST_CASE, this.addTestCases.bind(this));
     }
 
     onSuiteStart(suiteStats: SuiteStats) {
@@ -113,27 +117,48 @@ export class ZebrunnerReporter extends WDIOReporter {
         });
     }
 
-    async onTestFinish(testStats: TestStats, status: TestFinishStatus) {
+    async onTestFinish(testStats: TestStats, status: TestFinishStatus, testCaseDefaultStatus?: string) {
         return this.storage.trackOperationPromise(async () => {
-            // we need to log error first and only then track test finish.
-            // in order to not lost the test id between these asynchronous operations, store testId promise to a separate variable
+            // in order to not lost the test id between these asynchronous operations,
+            // store testId promise to a separate variable
             const testId: Promise<number> = this.storage.testId;
+            // the test cases also must be set to a variable. otherwise, we can lose them
+            const testTestCases = this.storage.testTestCases;
 
+            // we need to log error first and only then track test cases and test finish
             const stack: string = testStats.errors?.[0]?.stack;
             if (stack) {
                 this.log.error(stack);
             }
 
             if (testId) {
-                const request = new FinishTestRequest(status, stack);
-                return this.apiClient.finishTest(this.storage.testRunId, await testId, request);
+                if (testTestCases?.length) {
+                    this.setDefaultStatusIfActualNotProvided(testTestCases, testCaseDefaultStatus);
+
+                    // it is more natural to track test cases before finish of the test
+                    const request: UpsertTestTestCases = { items: testTestCases };
+                    await this.apiClient.upsertTestTestCases(this.storage.testRunId, await testId, request);
+                }
+
+                const finishTestRequest = new FinishTestRequest(status, stack);
+                return this.apiClient.finishTest(this.storage.testRunId, await testId, finishTestRequest);
             }
         });
     }
 
+    private setDefaultStatusIfActualNotProvided(testTestCases: TestCase[], testCaseDefaultStatus?: string) {
+        if (isNotBlankString(testCaseDefaultStatus)) {
+            testTestCases.forEach((testCase: TestCase) => {
+                if (!testCase.resultStatus) {
+                    testCase.resultStatus = testCaseDefaultStatus;
+                }
+            });
+        }
+    }
+
     async onRunnerEnd(runStats: RunnerStats) {
         await this.logsManager.close();
-        await this.storage.allPromises();
+        await this.storage.allOperationPromises();
 
         this.removeActionListeners();
         this.allEventsReportedToZebrunner = true;
@@ -141,14 +166,16 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     private removeActionListeners() {
         process.off(EventNames.SET_TEST_MAINTAINER, this.setTestMaintainer.bind(this));
-        process.off(EventNames.ATTACH_TEST_LABELS, this.attachTestLabels.bind(this));
-        process.off(EventNames.ATTACH_TEST_ARTIFACT_REFERENCES, this.attachTestArtifactReferences.bind(this));
         process.off(EventNames.REVERT_TEST_REGISTRATION, this.revertTestRegistration.bind(this));
 
-        process.off(EventNames.SAVE_TEST_SCREENSHOT_BUFFER, this.saveScreenshotBuffer.bind(this));
-
         process.off(EventNames.ATTACH_TEST_RUN_LABELS, this.attachTestRunLabels.bind(this));
+        process.off(EventNames.ATTACH_TEST_LABELS, this.attachTestLabels.bind(this));
+
         process.off(EventNames.ATTACH_TEST_RUN_ARTIFACT_REFERENCES, this.attachTestRunArtifactReferences.bind(this));
+        process.off(EventNames.ATTACH_TEST_ARTIFACT_REFERENCES, this.attachTestArtifactReferences.bind(this));
+
+        process.off(EventNames.SAVE_TEST_SCREENSHOT_BUFFER, this.saveScreenshotBuffer.bind(this));
+        process.off(EventNames.ADD_TEST_CASE, this.addTestCases.bind(this));
     }
 
     private setTestMaintainer(maintainer: string) {
@@ -161,9 +188,19 @@ export class ZebrunnerReporter extends WDIOReporter {
         });
     }
 
-    private attachTestRunLabels(key: string, values: string[]) {
+    private async revertTestRegistration() {
         return this.storage.trackOperationPromise(async () => {
             if (this.storage.testId) {
+                const testId = await this.storage.testId;
+                this.storage.testId = null;
+                return this.apiClient.revertTestRegistration(this.storage.testRunId, testId);
+            }
+        });
+    }
+
+    private attachTestRunLabels(key: string, values: string[]) {
+        return this.storage.trackOperationPromise(async () => {
+            if (this.storage.testRunId) {
                 const request = AttachLabelsRequest.ofSingleKey(key, values);
                 return this.apiClient.attachTestRunLabels(this.storage.testRunId, request);
             }
@@ -182,7 +219,7 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     private async attachTestRunArtifactReferences(name: string, value: string) {
         return this.storage.trackOperationPromise(async () => {
-            if (this.storage.testId) {
+            if (this.storage.testRunId) {
                 const request = AttachArtifactReferencesRequest.single(name, value);
                 return this.apiClient.attachTestRunArtifactReferences(this.storage.testRunId, request);
             }
@@ -208,13 +245,10 @@ export class ZebrunnerReporter extends WDIOReporter {
         });
     }
 
-    private async revertTestRegistration() {
-        return this.storage.trackOperationPromise(async () => {
-            if (this.storage.testId) {
-                const testId = await this.storage.testId;
-                this.storage.testId = null;
-                return this.apiClient.revertTestRegistration(this.storage.testRunId, testId);
-            }
-        });
+    private async addTestCases(testCase: TestCase) {
+        if (this.storage.testId) {
+            this.storage.addTestTestCase(testCase);
+        }
     }
+
 }
