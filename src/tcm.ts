@@ -21,72 +21,63 @@ const emitAddTestCaseEvent = (tcmType: TcmType, testCaseKey: string, resultStatu
 
 export const zebrunner = {
 
-    testCase: (testCaseKey: string) => {
-        emitAddTestCaseEvent('ZEBRUNNER', testCaseKey);
+    testCaseKey: (...testCaseKeys: string[]) => {
+        if (isNotEmptyArray(testCaseKeys)) {
+            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('ZEBRUNNER', testCaseKey));
+        }
     },
 
     testCaseStatus: (testCaseKey: string, resultStatus: string) => {
         emitAddTestCaseEvent('ZEBRUNNER', testCaseKey, resultStatus);
     },
 
-    testCases: (...testCaseKeys: string[]) => {
-        if (isNotEmptyArray(testCaseKeys)) {
-            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('ZEBRUNNER', testCaseKey));
-        }
-    },
+};
 
+const emitTestRailAddTestCaseEvent = (testCaseId: string, resultStatus?: string) => {
+    if (isNotBlankString(testCaseId) && testCaseId.startsWith('C')) {
+        testCaseId = testCaseId.substring(1);
+    }
+    emitAddTestCaseEvent('TEST_RAIL', testCaseId, resultStatus);
 };
 
 export const testRail = {
 
-    testCase: (testCaseKey: string) => {
-        emitAddTestCaseEvent('TEST_RAIL', testCaseKey);
-    },
-
-    testCaseStatus: (testCaseKey: string, resultStatus: string) => {
-        emitAddTestCaseEvent('TEST_RAIL', testCaseKey, resultStatus);
-    },
-
-    testCases: (...testCaseKeys: string[]) => {
-        if (isNotEmptyArray(testCaseKeys)) {
-            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('TEST_RAIL', testCaseKey));
+    testCaseId: (...testCaseIds: string[]) => {
+        if (isNotEmptyArray(testCaseIds)) {
+            testCaseIds.forEach((testCaseId: string) => emitTestRailAddTestCaseEvent(testCaseId));
         }
+    },
+
+    testCaseStatus: (testCaseId: string, resultStatus: string) => {
+        emitTestRailAddTestCaseEvent(testCaseId, resultStatus);
     },
 
 };
 
 export const xray = {
 
-    testCase: (testCaseKey: string) => {
-        emitAddTestCaseEvent('XRAY', testCaseKey);
+    testCaseKey: (...testCaseKeys: string[]) => {
+        if (isNotEmptyArray(testCaseKeys)) {
+            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('XRAY', testCaseKey));
+        }
     },
 
     testCaseStatus: (testCaseKey: string, resultStatus: string) => {
         emitAddTestCaseEvent('XRAY', testCaseKey, resultStatus);
     },
 
-    testCases: (...testCaseKeys: string[]) => {
-        if (isNotEmptyArray(testCaseKeys)) {
-            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('XRAY', testCaseKey));
-        }
-    },
-
 };
 
 export const zephyr = {
 
-    testCase: (testCaseKey: string) => {
-        emitAddTestCaseEvent('ZEPHYR', testCaseKey);
+    testCaseKey: (...testCaseKeys: string[]) => {
+        if (isNotEmptyArray(testCaseKeys)) {
+            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('ZEPHYR', testCaseKey));
+        }
     },
 
     testCaseStatus: (testCaseKey: string, resultStatus: string) => {
         emitAddTestCaseEvent('ZEPHYR', testCaseKey, resultStatus);
-    },
-
-    testCases: (...testCaseKeys: string[]) => {
-        if (isNotEmptyArray(testCaseKeys)) {
-            testCaseKeys.forEach((testCaseKey: string) => emitAddTestCaseEvent('ZEPHYR', testCaseKey));
-        }
     },
 
 };

@@ -19,12 +19,12 @@ describe('Ebay Product Search', () => {
 
     it('empty test', async () => {
         currentTest.attachLabel('empty', 'true');
-        testRail.testCases('1', '2', '3');
+        testRail.testCaseId('1', 'C2', '3');
     });
 
     it('empty test with browser.reloadSession()', async () => {
         currentTest.setMaintainer('vasya');
-        zebrunner.testCase('DEF-1');
+        zebrunner.testCaseKey('DEF-1');
         await browser.reloadSession();
         zebrunner.testCaseStatus('DEF-2', 'PASSED');
         currentTest.attachLabel('reloaded', 'true');
@@ -32,7 +32,7 @@ describe('Ebay Product Search', () => {
 
     it('should verify title search laptop and verify title', async () => {
         currentTest.setMaintainer('vasya');
-        zephyr.testCases('QT-1', 'QT-2')
+        zephyr.testCaseKey('QT-1', 'QT-2')
         currentTest.attachArtifactReference('Zebrunner', 'https://zebrunner.com');
 
         await browser.url(`https://www.ebay.com`);
@@ -56,7 +56,7 @@ describe('Ebay Product Search', () => {
     it('should search telephones and verify title', async () => {
         const searchInput = $('#gh-ac');
         const searchBtn = $('#gh-btn');
-        xray.testCase('CASE-22');
+        xray.testCaseKey('CASE-22');
 
         await searchInput.clearValue();
         xray.testCaseStatus('CASE-22', 'STATUS');
@@ -66,7 +66,7 @@ describe('Ebay Product Search', () => {
         await searchBtn.click();
 
         currentLaunch.attachArtifactReference('ebay', 'https://ebay.com');
-        xray.testCases('CASE-2', 'CASE-22', 'CASE-222');
+        xray.testCaseKey('CASE-2', 'CASE-22', 'CASE-222');
 
         await expect(searchInput)
             .toHaveValue('telephones');

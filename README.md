@@ -152,41 +152,78 @@ The Zebrunner Reporter can automatically capture and save screenshots during the
 | `REPORTING_SCREENSHOT_AFTER_COMMANDS`<br/>`screenshot.afterCommands`   | A comma-separated list of WebdriverIO commands after which the Agent will take a screenshot of the browser or device. The default list of commands is `'click', 'doubleClick', 'navigateTo', 'elementClick', 'scroll', 'scrollIntoView'`. |
 | `REPORTING_SCREENSHOT_AFTER_ERROR`<br/>`screenshot.afterError`         | If the value is set to `true`, the Agent will automatically take a screenshot after every failed test. The default value is `true`.                                                                                                       |
 
-#### Test Case Management systems integration
+#### Integration with Test Case Management systems
 
-Zebrunner provides an ability to upload test results to external test case management systems (TCMs) on test run finish. For some TCMs it is possible to upload results in real-time during the test run execution.
+Zebrunner integrates with different Test Case Management (TCM) systems and provides the following capabilities:
 
-This functionality is currently supported for TestRail, Xray, Zephyr Squad and Zephyr Scale.
+1. Linking test cases to test executions
+2. Previewing linked test cases in Zebrunner
+3. Pushing test execution results to the TCM system
+
+This functionality is currently supported only for Zebrunner Test Case Management, TestRail, Xray, Zephyr Squad and Zephyr Scale.
+
+The link between execution of a test method and corresponding test cases can only be set from within the test method code. For more information about this, see the [Linking test cases to test executions](#linking-test-cases-to-test-executions) section.
+
+If you want to push the execution results to the TCM system, you need to provide additional configuration for the Agent. For all the supported TCMs, Zebrunner can push results to a pre-created test suite execution (this term has a different name in different systems). For TestRail, you can also create a new Test Run based on the Agent configuration and push the results into it. If enabled, the push can be performed either at the end of the whole launch, or in real time after each test.
+
+The following subsection covers how to provide configuration for pushing results to each of the TCM systems.
+
+##### Zebrunner Test Case Management (TCM)
+
+| Env var / Reporter config                                                      | Description                                                                                                                                                             |
+|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_ZEBRUNNER_PUSH_RESULTS`<br/>`tcm.zebrunner.pushResults`         | Boolean value which specifies if the execution results should be pushed to Zebrunner TCM. The default value is `false`.                                                 |
+| `REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME`<br/>`tcm.zebrunner.pushInRealTime` | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. |
+| `REPORTING_TCM_ZEBRUNNER_TEST_RUN_ID`<br/>`tcm.zebrunner.testRunId`            | Numeric id of the target Test Run in Zebrunner TCM. If a value is not provided, no new runs will be created.                                                            |
 
 ##### TestRail
 
-| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
-|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `REPORTING_TCM_TESTRAIL_ENABLED`<br/>`tcmIntegration.testRail.enabled`  | Optional. Disables result upload. |
-| `REPORTING_TCM_TESTRAIL_SUITE_ID`<br/>`tcmIntegration.testRail.suiteId` | Mandatory. The method sets TestRail suite id for current test run. |
-| `REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN`<br/>`tcmIntegration.testRail.includeAllTestCasesInNewRun` | Optional. Includes all cases from suite into newly created run in TestRail. |
-| `REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.testRail.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. Enabling of this option sets automatically `includeAllTestCasesInNewRun` to `true` as well. |
-| `REPORTING_TCM_TESTRAIL_RUN_ID`<br/>`tcmIntegration.testRail.runId` | Optional. Adds result into existing TestRail run. If not provided, test run is treated as new. |
-| `REPORTING_TCM_TESTRAIL_RUN_NAME`<br/>`tcmIntegration.testRail.runName` | Optional. Sets custom name for new TestRail run. By default, Zebrunner test run name is used. |
-| `REPORTING_TCM_TESTRAIL_MILESTONE`<br/>`tcmIntegration.testRail.milestone` | Optional. Adds result in TestRail milestone with the given name. |
-| `REPORTING_TCM_TESTRAIL_ASSIGNEE`<br/>`tcmIntegration.testRail.assignee` | Optional. Sets TestRail run assignee - should be email of existing TestRail user. |
+| Env var / Reporter config                                                                      | Description                                                                                                                                                                                                                                            |
+|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_TESTRAIL_PUSH_RESULTS`<br/>`tcm.testRail.pushResults`                           | Boolean value which specifies if the execution results should be pushed to TestRail. The default value is `false`.                                                                                                                                     |
+| `REPORTING_TCM_TESTRAIL_PUSH_IN_REAL_TIME`<br/>`tcm.testRail.pushInRealTime`                   | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. Enabling of this option forces the `includeAllTestCasesInNewRun` to be `true`. |
+| `REPORTING_TCM_TESTRAIL_SUITE_ID`<br/>`tcm.testRail.suiteId`                                   | Specifies the numeric id of the TestRail Suite in which the tests reside. TestRail displays the ids prefixed with 'S' letter. You need to provide the id without this letter.                                                                          |
+| `REPORTING_TCM_TESTRAIL_RUN_ID`<br/>`tcm.testRail.runId`                                       | The id of the TestRail Test Run in which the results should be pushed. TestRail displays the ids prefixed with 'R' letter. You need to provide the id without this letter.                                                                             |
+| `REPORTING_TCM_TESTRAIL_RUN_NAME`<br/>`tcm.testRail.runName`                                   | Specifies the name of a new Test Run in TestRail. If push is enabled and run id is not provided, Zebrunner will create a new run in TestRail. If the value is not provided, Zebrunner will use the launch display name.                                |
+| `REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN`<br/>`tcm.testRail.includeAllTestCasesInNewRun` | If the value is set to `true`, all cases from the Suite will be added to the newly created Test Run. The value is forced to be `true` if real-time push is enabled. Default value is `false`.                                                          |
+| `REPORTING_TCM_TESTRAIL_MILESTONE_NAME`<br/>`tcm.testRail.milestoneName`                       | The newly created Test Run will be associated with the milestone specified using this property.                                                                                                                                                        |
+| `REPORTING_TCM_TESTRAIL_ASSIGNEE`<br/>`tcm.testRail.assignee`                                  | Assignee of the newly created Test Run. The value should be the email of an existing TestRail user.                                                                                                                                                    |
 
 ##### Xray
 
-| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
-|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `REPORTING_TCM_XRAY_ENABLED`<br/>`tcmIntegration.xray.enabled`  | Optional. Disables result upload. |
-| `REPORTING_TCM_XRAY_EXECUTION_KEY`<br/>`tcmIntegration.xray.executionKey` | Mandatory. The method sets Xray execution key. |
-| `REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.xray.enableRealTimeSync` | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
+| Env var / Reporter config                                            | Description                                                                                                                                                             |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_XRAY_PUSH_RESULTS`<br/>`tcm.xray.pushResults`         | Boolean value which specifies if the execution results should be pushed to Xray. The default value is `false`.                                                          |
+| `REPORTING_TCM_XRAY_PUSH_IN_REAL_TIME`<br/>`tcm.xray.pushInRealTime` | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. |
+| `REPORTING_TCM_XRAY_EXECUTION_KEY`<br/>`tcm.xray.executionKey`       | The key of the Xray Execution where the results should be pushed.                                                                                                       |
 
 ##### Zephyr
 
-| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
-|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `REPORTING_TCM_ZEPHYR_ENABLED`<br/>`tcmIntegration.zephyr.enabled`  | Optional. Disables result upload. |
-| `REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY`<br/>`tcmIntegration.zephyr.testCycleKey` | Mandatory. The method sets Zephyr test cycle key. |
-| `REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY`<br/>`tcmIntegration.zephyr.jiraProjectKey` | Mandatory. Sets Zephyr Jira project key. |
-| `REPORTING_TCM_ZEPHYR_ENABLE_REAL_TIME_SYNC`<br/>`tcmIntegration.zephyr.enableRealTimeSync`  | Optional. Enables real-time results upload. In this mode, result of test execution will be uploaded immediately after test finish. |
+| Env var / Reporter config                                                | Description                                                                                                                                                             |
+|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_ZEPHYR_PUSH_RESULTS`<br/>`tcm.zephyr.pushResults`         | Boolean value which specifies if the execution results should be pushed to Zephyr. The default value is `false`.                                                        |
+| `REPORTING_TCM_ZEPHYR_PUSH_IN_REAL_TIME`<br/>`tcm.zephyr.pushInRealTime` | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. |
+| `REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY`<br/>`tcm.zephyr.jiraProjectKey`  | Specifies the key of the Jira project where the tests reside.                                                                                                           |
+| `REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY`<br/>`tcm.zephyr.testCycleKey`      | The key of the Zephyr Test Cycle where the results should be pushed.                                                                                                    |
+
+##### Custom Result Statuses
+
+By default, when the execution results are being pushed to a TCM system, Zebrunner maps each test execution result to an appropriate result status in the target TCM system. Most of the time this work perfectly, but in some cases Zebrunner is not able to derive the appropriate target result status. 
+
+One of the examples of such cases is when a test case result status does not correlate with the test execution status, or when you have conditional logic determining the actual result status for the test case. For such cases the Agent comes with a special method which sets a specific Result Status to the test case. For more information about this, see the [Linking test cases to test executions](#linking-test-cases-to-test-executions) section.
+
+Another example is custom Result Statuses in target TCM system. In this case we cannot anticipate the correct status and simply skip the test execution. In order to tackle this, Zebrunner allows you to configure default status for passed and failed test executions (for skipped tests this is not technically possible, because the tests are not executed by Webdriver.io).
+
+| Env var / Reporter config                                                | Description                                                                                              |
+|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_TEST_CASE_STATUS_ON_PASS`<br/>`tcm.testCaseStatus.onPass` | The default status that will be assigned to passed test executions when they are pushed to a TCM system. |
+| `REPORTING_TCM_TEST_CASE_STATUS_ON_FAIL`<br/>`tcm.testCaseStatus.onFail` | The default status that will be assigned to failed test executions when they are pushed to a TCM system. |
+
+When pushing results to a TCM system, Zebrunner derives the Result Status in the following order:
+
+1. Checks the explicitly assigned value (which was assigned using the `#testCaseStatus()` method).
+2. Takes the default status provided via configuration for passed and/or failed tests.
+3. Uses internal mapping of Zebrunner statuses to the Result Statuses of the target TCM system. 
 
 ### Examples
 
@@ -221,23 +258,30 @@ This functionality is currently supported for TestRail, Xray, Zephyr Squad and Z
     REPORTING_SCREENSHOT_AFTER_COMMANDS=""
     REPORTING_SCREENSHOT_AFTER_ERROR=true
 
-    REPORTING_TCM_TESTRAIL_ENABLED=true
+    REPORTING_TCM_TEST_CASE_STATUS_ON_PASS=PASS
+    REPORTING_TCM_TEST_CASE_STATUS_ON_FAIL=FAIL
+
+    REPORTING_TCM_ZEBRUNNER_PUSH_RESULTS=false
+    REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME=true
+    REPORTING_TCM_ZEBRUNNER_TEST_RUN_ID=42
+
+    REPORTING_TCM_TESTRAIL_PUSH_RESULTS=false
+    REPORTING_TCM_TESTRAIL_PUSH_IN_REAL_TIME=true
     REPORTING_TCM_TESTRAIL_SUITE_ID=100
-    REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN=true
-    REPORTING_TCM_TESTRAIL_ENABLE_REAL_TIME_SYNC=true
     REPORTING_TCM_TESTRAIL_RUN_ID=500
-    REPORTING_TCM_TESTRAIL_RUN_NAME=Demo run
-    REPORTING_TCM_TESTRAIL_MILESTONE=Demo milestone
+    REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN=true
+    REPORTING_TCM_TESTRAIL_RUN_NAME=New Demo Run
+    REPORTING_TCM_TESTRAIL_MILESTONE_NAME=Demo Milestone
     REPORTING_TCM_TESTRAIL_ASSIGNEE=tester@mycompany.com
 
-    REPORTING_TCM_XRAY_ENABLED=true
-    REPORTING_TCM_XRAY_EXECUTION_KEY=ZEB-1
-    REPORTING_TCM_XRAY_ENABLE_REAL_TIME_SYNC=true
+    REPORTING_TCM_XRAY_PUSH_RESULTS=false
+    REPORTING_TCM_XRAY_PUSH_IN_REAL_TIME=true
+    REPORTING_TCM_XRAY_EXECUTION_KEY=QT-100
 
-    REPORTING_TCM_ZEPHYR_ENABLED=true
-    REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY=ZEB-T1
+    REPORTING_TCM_ZEPHYR_PUSH_RESULTS=false
+    REPORTING_TCM_ZEPHYR_PUSH_IN_REAL_TIME=true
     REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY=ZEB
-    REPORTING_TCM_ZEPHYR_ENABLE_REAL_TIME_SYNC=true
+    REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY=ZEB-T1
     ```
 
 === "`wdio.conf.js` file"
@@ -290,27 +334,36 @@ This functionality is currently supported for TestRail, Xray, Zephyr Squad and Z
                     teamsChannels: 'dev-channel, management',
                     emails: 'manager@mycompany.com'
                 },
-                tcmIntegration: {
+                tcm: {
+                    testCaseStatus: {
+                        onPass: 'PASS',
+                        onFail: 'FAIL',
+                    },
+                    zebrunner: {
+                        pushResults: false,
+                        pushInRealTime: true,
+                        testRunId: 42
+                    },
                     testRail: {
-                        enabled: true,
-                        suiteId: "100",
+                        pushResults: false,
+                        pushInRealTime: true,
+                        suiteId: 100,
+                        runId: 500,
                         includeAllTestCasesInNewRun: true,
-                        enableRealTimeSync: true,
-                        runId: "500",
-                        runName: "Demo run",
-                        milestone: "Demo milestone",
-                        assignee: "tester@mycompany.com"
+                        runName: 'New Demo Run',
+                        milestoneName: 'Demo Milestone',
+                        assignee: 'tester@mycompany.com'
                     },
                     xray: {
-                        enabled: true,
-                        executionKey: "QT-100",
-                        enableRealTimeSync: true
+                        pushResults: false,
+                        pushInRealTime: true,
+                        executionKey: 'QT-100'
                     },
                     zephyr: {
-                        enabled: true,
-                        testCycleKey: "ZEB-T1",
-                        jiraProjectKey: "ZEB",
-                        enableRealTimeSync: true
+                        pushResults: false,
+                        pushInRealTime: true,
+                        jiraProjectKey: 'ZEB',
+                        testCycleKey: 'ZEB-T1'
                     }
                 }
             }
@@ -392,19 +445,19 @@ describe('Test Suite', () => {
 
     before(function () {
         logger.warn('this log message will not be submitted into Zebrunner')
-    })
+    });
 
     beforeEach(function () {
         logger.info('test started')
-    })
+    });
 
     it('empty test', () => {
         logger.debug('executing empty test...')
-    })
+    });
 
     afterEach(function () {
         logger.info('test finished')
-    })
+    });
 
 })
 ```
@@ -439,7 +492,7 @@ describe('Test Suite', () => {
         currentTest.saveScreenshot(await browser.takeScreenshot())
         currentTest.saveScreenshot(Buffer.from(await browser.takeScreenshot(), 'base64'))
         // do something
-    })
+    });
 
 })
 ```
@@ -459,16 +512,16 @@ describe('Test Suite', () => {
 
     beforeEach(function () {
         currentTest.setMaintainer('Deve Loper')
-    })
+    });
 
     it('first important test', () => {
         currentTest.setMaintainer('Joel Miller')
         // test method code
-    })
+    });
 
     it('second important test', () => {
         // test method code
-    })
+    });
 
 })
 ```
@@ -493,24 +546,24 @@ describe('Test Suite', () => {
     before(function () {
         // will be attached to the entire run
         currentLaunch.attachLabel('label', 'value')
-    })
+    });
 
     it('first test', () => {
         // will be attached to this test only
         currentTest.attachLabel('order', '1')
-    })
+    });
 
     it('second test', () => {
         // will be attached to this test only
         currentTest.attachLabel('order', '2')
         // will be attached to the entire run
         currentLaunch.attachLabel('second-test-executed', 'true')
-    })
+    });
 
     afterEach(function () {
         // will be attached to each test
         currentTest.attachLabel('after-each-executed', 'true')
-    })
+    });
 
 })
 ```
@@ -531,12 +584,12 @@ describe('Test Suite', () => {
     before(function () {
         // will be attached to the entire run
         currentLaunch.attachArtifactReference('Zebrunner', 'https://zebrunner.com')
-    })
+    });
 
     it('important test', () => {
         // will be attached to this test only
         currentTest.attachArtifactReference('SUT', 'https://myapp.com/app')
-    })
+    });
 
 })
 ```
@@ -557,77 +610,184 @@ describe('Test Suite', () => {
             currentTest.revertRegistration()
         }
         // test code
-    })
+    });
 
 })
 ```
 
 It is worth mentioning that the method invocation does not affect the test execution, but simply unregisters the test in Zebrunner. To interrupt the test execution, you need to do additional actions, for example, throw an Error.
 
-## Upload test results to external test case management systems
+## Linking test cases to test executions
 
-For successful upload of test run results to any Test Case Management system, 3 steps must be performed:
+Note: to learn more about pushing results to a TCM system, see the [Integration with Test Case Management systems](#integration-with-test-case-management-systems) section.
 
-1. Integration with TCM is configured and enabled for Zebrunner project;
-2. General TCM configuration is added using environment variables or `wdio.conf.js` file. To learn more, refer to [Test Case Management systems integration section](#test-case-management-systems-integration);
-3. TCM test cases are linked with specific WDIO tests:
+### Zebrunner TCM
 
-### Testrail
+The Agent comes with the `zebrunner` object which contains methods to link test cases to a currently executing test: 
+
+- `#testCaseKey(...testCaseKeys)` - accepts a list of test cases which should be linked to the current test;
+- `#testCaseStatus(testCaseKey, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus('KEY-1', 'SKIPPED')` first, and then invoke the `#testCaseKey('KEY-1')`, then the result status you provided in the first invocation will be ignored.
+
+Here is an example:
 
 ```js
-const {currentTest} = require("@zebrunner/javascript-agent-webdriverio")
+const {zebrunner} = require("@zebrunner/javascript-agent-webdriverio")
 
 describe('Test Suite', () => {
 
     it('first test', () => {
-        currentTest.setTestRailCaseId("1000", "1001");  
+        // links single test case 'KEY-1000' to the test
+        zebrunner.testCaseKey("KEY-1000");
         // test code
-    })
+    });
 
     it('second test', () => {
-        currentTest.setTestRailCaseId("1002");
+        // links test cases 'KEY-2000' and 'KEY-2001' to the current test
+        zebrunner.testCaseKey("KEY-2000", "KEY-2001");
         // test code
-    })
+    });
+
+    it('third test', () => {
+        // links test case 'KEY-3000' to the current test
+        zebrunner.testCaseKey("KEY-3000");
+        // test code
+        if (someCondition) {
+            // overriddes the status of the test case when results are pushed to the Zebrunner TCM.
+            // using this method, you can manually specify the desired result status. 
+            zebrunner.testCaseStatus("KEY-3000", "SKIPPED");
+        }
+    });
+
+})
+```
+
+### Testrail
+
+The Agent comes with the `testRail` object which contains methods to link test cases to a currently executing test: 
+
+- `#testCaseId(...testCaseIds)` - accepts a list of test cases which should be linked to current test;
+- `#testCaseStatus(testCaseId, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus('C1', 'SKIPPED')` first and then invoke the `#testCaseId('C1')`, then the result status you provided in first invocation will be ignored.
+
+Here is an example:
+
+```js
+const {testRail} = require("@zebrunner/javascript-agent-webdriverio")
+
+describe('Test Suite', () => {
+
+    it('first test', () => {
+        // links single test case 'C1002' to the test
+        testRail.testCaseId("C1000");
+        // test code
+    });
+
+    it('second test', () => {
+        // links test cases 'C2000' and 'C2001' to the current test
+        testRail.testCaseId("C2000", "C2001");
+        // test code
+    });
+
+    it('third test', () => {
+        // links test case 'C3000' to the current test
+        testRail.testCaseId("C3000");
+        // test code
+        if (someCondition) {
+            // overriddes the status of the test case when results are pushed to the TestRail.
+            // by default Zebrunner maps the test execution result to a result status from TestRail.
+            // using this method, you can manually specify the desired result status. 
+            testRail.testCaseStatus("C3000", "SKIPPED");
+        }
+    });
 
 })
 ```
 
 ### Xray
 
+The Agent comes with the `xray` object which contains methods to link test cases to a currently executing test:
+
+- `#testCaseKey(...testCaseKeys)` - accepts a list of test cases which should be linked to current test;
+- `#testCaseStatus(testCaseKey, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus('KEY-1', 'SKIP')` first, and then invoke the `#testCaseKey('KEY-1')`, then the result status you provided in first invocation will be ignored.
+
+Here is an example:
+
 ```js
-const {currentTest} = require("@zebrunner/javascript-agent-webdriverio")
+const {xray} = require("@zebrunner/javascript-agent-webdriverio")
 
 describe('Test Suite', () => {
 
     it('first test', () => {
-        currentTest.setXrayTestKey("QT-1", "QT-2", "QT-3");
+        // links single test case 'KEY-1000' to the test
+        xray.testCaseKey("KEY-1000");
         // test code
-    })
+    });
 
     it('second test', () => {
-        currentTest.setXrayTestKey("QT-4");
+        // links test cases 'KEY-2000' and 'KEY-2001' to the current test
+        xray.testCaseKey("KEY-2000", "KEY-2001");
         // test code
-    })
+    });
+
+    it('third test', () => {
+        // links test case 'KEY-3000' to the current test
+        xray.testCaseKey("KEY-3000");
+        // test code
+        if (someCondition) {
+            // overriddes the status of the test case when results are pushed to the Xray.
+            // by default Zebrunner maps the test execution result to a result status from Xray.
+            // using this method, you can manually specify the desired result status. 
+            xray.testCaseStatus("KEY-3000", "SKIP");
+        }
+    });
 
 })
 ```
 
 ### Zephyr
 
+The Agent comes with the `zephyr` object which contains methods to link test cases to currently executing test:
+
+- `#testCaseKey(...testCaseKeys)` - accepts a list of test cases which should be linked to current test;
+- `#testCaseStatus(testCaseKey, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus('KEY-1', 'SKIP')` first, and then invoke the `#testCaseKey('KEY-1')`, then the result status you provided in first invocation will be ignored.
+
+Here is an example:
+
 ```js
-const {currentTest} = require("@zebrunner/javascript-agent-webdriverio")
+const {zephyr} = require("@zebrunner/javascript-agent-webdriverio")
 
 describe('Test Suite', () => {
 
     it('first test', () => {
-        currentTest.setZephyrTestCaseKey("ZEB-T1", "ZEB-T2", "ZEB-T3");
+        // links single test case 'KEY-1000' to the test
+        zephyr.testCaseKey("KEY-1000");
         // test code
-    })
+    });
 
     it('second test', () => {
-        currentTest.setZephyrTestCaseKey("ZEB-T4");
+        // links test cases 'KEY-2000' and 'KEY-2001' to the current test
+        zephyr.testCaseKey("KEY-2000", "KEY-2001");
         // test code
-    })
+    });
+
+    it('third test', () => {
+        // links test case 'KEY-3000' to the current test
+        zephyr.testCaseKey("KEY-3000");
+        // test code
+        if (someCondition) {
+            // overriddes the status of the test case when results are pushed to the Zephyr.
+            // by default Zebrunner maps the test execution result to a result status from Zephyr.
+            // using this method, you can manually specify the desired result status. 
+            zephyr.testCaseStatus("KEY-3000", "SKIP");
+        }
+    });
 
 })
 ```
