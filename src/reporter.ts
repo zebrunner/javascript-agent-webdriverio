@@ -98,11 +98,13 @@ export class ZebrunnerReporter extends WDIOReporter {
     }
 
     async onTestPass(testStats: TestStats) {
-        return this.onTestFinish(testStats, 'PASSED');
+        const testCaseStatusOnPass = this.storage.reportingConfig.tcm?.testCaseStatus?.onPass;
+        return this.onTestFinish(testStats, 'PASSED', testCaseStatusOnPass);
     }
 
     async onTestFail(testStats: TestStats) {
-        return this.onTestFinish(testStats, 'FAILED');
+        const testCaseStatusOnFail = this.storage.reportingConfig.tcm?.testCaseStatus?.onFail;
+        return this.onTestFinish(testStats, 'FAILED', testCaseStatusOnFail);
     }
 
     async onTestSkip(testStats: TestStats) {

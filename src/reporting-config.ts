@@ -266,7 +266,7 @@ export class ReportingConfig {
             },
             zebrunner: {
                 pushResults: getBoolean('REPORTING_TCM_ZEBRUNNER_PUSH_RESULTS', config?.tcm?.zebrunner?.pushResults),
-                pushInRealTime: getBoolean('REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME', config?.tcm?.zebrunner?.pushResults),
+                pushInRealTime: getBoolean('REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME', config?.tcm?.zebrunner?.pushInRealTime),
                 testRunId: getNumber('REPORTING_TCM_ZEBRUNNER_TEST_RUN_ID', config?.tcm?.zebrunner?.testRunId),
             },
             testRail: {
