@@ -69,14 +69,16 @@ export class ZebrunnerReporter extends WDIOReporter {
 
     onSuiteStart(suiteStats: SuiteStats) {
         this.storage.currentSpec = suiteStats.file;
+        this.storage.addTestGroup(suiteStats.fullTitle);
     }
 
     async onTestStart(testStats: TestStats) {
         this.storage.currentTest = testStats;
 
         const spec = this.storage.currentSpec;
+        const testGroups = this.storage.testTestGroups;
         const correlationData = new CorrelationData(spec, testStats.fullTitle).stringify();
-        const request = new StartTestRequest(testStats, spec, correlationData);
+        const request = new StartTestRequest(testStats, spec, correlationData, testGroups);
 
         const testIdToRerun = this.storage.getTestIdToRerun(correlationData);
         this.storage.testId = testIdToRerun
@@ -154,6 +156,10 @@ export class ZebrunnerReporter extends WDIOReporter {
                 }
             });
         }
+    }
+
+    onSuiteEnd(suiteStats: SuiteStats) {
+        this.storage.removeLastTestGroup();
     }
 
     async onRunnerEnd(runStats: RunnerStats) {

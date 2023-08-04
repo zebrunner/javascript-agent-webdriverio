@@ -9,13 +9,15 @@ export class StartTestRequest {
     startedAt: Date;
     maintainer?: string;
     correlationData?: string;
+    testGroups: string[];
 
-    constructor(testStats: TestStats, spec: string, correlationData: string) {
+    constructor(testStats: TestStats, spec: string, correlationData: string, testGroups: string[]) {
         this.name = testStats.fullTitle;
         this.className = spec;
         this.methodName = testStats.title;
         this.startedAt = new Date();
         this.correlationData = correlationData;
+        this.testGroups = testGroups;
     }
 
 }
