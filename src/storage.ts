@@ -15,6 +15,7 @@ export class Storage {
     private correlationDataToTestIdToRerun: Map<string, number> = null;
 
     private _currentSpec: string;
+    private _testTestGroups: string[] = [];
     currentTest: TestStats;
     private _testTestCases: TestCase[] = [];
 
@@ -66,12 +67,24 @@ export class Storage {
         return this._currentSpec;
     }
 
+    get testTestGroups(): string[] {
+        return this._testTestGroups;
+    }
+
     set currentSpec(currentSpec: string) {
         this._currentSpec = Storage.normalizeSpec(currentSpec);
     }
 
     get testTestCases(): TestCase[] {
         return this._testTestCases;
+    }
+
+    addTestGroup(testGroup: string) {
+        this._testTestGroups.push(testGroup);
+    }
+
+    removeLastTestGroup() {
+        this._testTestGroups.pop();
     }
 
     addTestTestCase(testCase: TestCase) {
