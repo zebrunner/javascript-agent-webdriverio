@@ -22,3 +22,5 @@ export { ArtifactReference } from './artifact-reference';
 export { UpdateTestRequest } from './update-test';
 export { AttachLabelsRequest } from './attach-labels';
 export { AttachArtifactReferencesRequest } from './attach-artifact-references';
+
+export { SummarySendingPolicy } from './summary-sending-policy';

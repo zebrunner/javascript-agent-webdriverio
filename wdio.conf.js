@@ -82,6 +82,7 @@ exports.config = {
                 },
                 notifications: {
                     notifyOnEachFailure: false,
+                    summarySendingPolicy: 'NEVER',
                     slackChannels: 'dev, qa',
                     teamsChannels: 'dev-channel, management',
                     emails: 'sbrenko@zebrunner.com'

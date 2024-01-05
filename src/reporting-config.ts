@@ -1,6 +1,6 @@
 import log from 'loglevel';
-import { ArtifactReference, Label } from './types';
 import { isArray, isNotBlankString, isString } from './type-utils';
+import { ArtifactReference, Label, SummarySendingPolicy } from './types';
 
 const logger = log.getLogger('zebrunner');
 
@@ -54,6 +54,7 @@ export interface ScreenshotConfig {
 interface NotificationsConfig {
 
     readonly notifyOnEachFailure: boolean;
+    readonly summarySendingPolicy: SummarySendingPolicy;
 
     readonly slackChannels: string;
     readonly teamsChannels: string;
@@ -166,6 +167,22 @@ function getSetOfStrings(envVar: string, configValue: any, defaultValue: string[
     return new Set<string>(values);
 }
 
+function getEnum<T>(envVar: string, configValue: any, enumType: T, defaultValue: T[keyof T] = null): T[keyof T] {
+    const enumValueAsString = getString(envVar, configValue);
+    if (!enumValueAsString) {
+        return defaultValue;
+    }
+
+    const enumValue = Object.keys(enumType).find((enumValue) => enumValue.toLowerCase() === enumValueAsString.toLowerCase());
+    if (!enumValue) {
+        logger.warn(`${enumValueAsString} is not in the list of valid enum values: ${Object.keys(enumType)}`);
+
+        return defaultValue;
+    }
+
+    return enumValue as T[keyof T];
+}
+
 function parseLabels(config: any): Label[] {
     const labels = config?.launch?.labels || {};
 
@@ -254,6 +271,7 @@ export class ReportingConfig {
 
         this.notifications = {
             notifyOnEachFailure: getBoolean('REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE', config?.notifications?.notifyOnEachFailure),
+            summarySendingPolicy: getEnum('REPORTING_NOTIFICATION_SUMMARY_SENDING_POLICY', config?.notifications?.summarySendingPolicy, SummarySendingPolicy),
             slackChannels: getString('REPORTING_NOTIFICATION_SLACK_CHANNELS', config?.notifications?.slackChannels),
             teamsChannels: getString('REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS', config?.notifications?.teamsChannels),
             emails: getString('REPORTING_NOTIFICATION_EMAILS', config?.notifications?.emails),
